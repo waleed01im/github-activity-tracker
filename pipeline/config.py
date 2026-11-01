@@ -6,7 +6,6 @@ load_dotenv()
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
-SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 
 GITHUB_API = "https://api.github.com"
 
@@ -26,5 +25,3 @@ def check_config():
         raise RuntimeError("SUPABASE_URL missing in .env")
     if not SUPABASE_SERVICE_KEY:
         raise RuntimeError("SUPABASE_SERVICE_KEY missing in .env")
-    if not SUPABASE_ANON_KEY:
-        raise RuntimeError("SUPABASE_ANON_KEY missing in .env")
