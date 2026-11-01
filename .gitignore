@@ -1,4 +1,5 @@
 .env
+data/rejected/*.jsonl
 venv/
 __pycache__/
 data/raw/
