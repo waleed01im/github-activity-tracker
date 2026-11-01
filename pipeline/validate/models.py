@@ -18,7 +18,6 @@ class EventModel(BaseModel):
     type: str
     actor_login: str | None = None
     action: str | None = None
-    commit_count: int | None = None
     created_at: datetime
 
 

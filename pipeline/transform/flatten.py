@@ -37,7 +37,6 @@ def flatten_events(events):
         "type": df["type"],
         "actor_login": df["actor.login"],
         "action": df.get("payload.action"),
-        "commit_count": df.get("payload.size"),
         "created_at": df["created_at"],
     })
 
