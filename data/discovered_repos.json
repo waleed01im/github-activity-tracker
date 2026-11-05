@@ -1,0 +1,250 @@
+{
+  "frontend": [
+    {
+      "full_name": "freeCodeCamp/freeCodeCamp",
+      "stargazers_count": 458610,
+      "language": "TypeScript"
+    },
+    {
+      "full_name": "morluto/rea",
+      "stargazers_count": 433977,
+      "language": "TypeScript"
+    },
+    {
+      "full_name": "react/react",
+      "stargazers_count": 252009,
+      "language": "JavaScript"
+    },
+    {
+      "full_name": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "stargazers_count": 145671,
+      "language": "Python"
+    },
+    {
+      "full_name": "vercel/next.js",
+      "stargazers_count": 143337,
+      "language": "JavaScript"
+    },
+    {
+      "full_name": "shadcn-ui/ui",
+      "stargazers_count": 127434,
+      "language": "TypeScript"
+    },
+    {
+      "full_name": "react/react-native",
+      "stargazers_count": 126858,
+      "language": "C++"
+    },
+    {
+      "full_name": "immich-app/immich",
+      "stargazers_count": 118330,
+      "language": "TypeScript"
+    },
+    {
+      "full_name": "ruvnet/RuView",
+      "stargazers_count": 102547,
+      "language": "Rust"
+    },
+    {
+      "full_name": "angular/angular",
+      "stargazers_count": 101126,
+      "language": "TypeScript"
+    },
+    {
+      "full_name": "ant-design/ant-design",
+      "stargazers_count": 100088,
+      "language": "TypeScript"
+    },
+    {
+      "full_name": "mui/material-ui",
+      "stargazers_count": 99300,
+      "language": "JavaScript"
+    }
+  ],
+  "backend": [
+    {
+      "full_name": "fastapi/fastapi",
+      "stargazers_count": 104455,
+      "language": "Python"
+    },
+    {
+      "full_name": "django/django",
+      "stargazers_count": 91541,
+      "language": "Python"
+    },
+    {
+      "full_name": "spring-projects/spring-boot",
+      "stargazers_count": 81739,
+      "language": "Java"
+    },
+    {
+      "full_name": "headroomlabs-ai/headroom",
+      "stargazers_count": 78925,
+      "language": "Python"
+    },
+    {
+      "full_name": "apache/superset",
+      "stargazers_count": 75423,
+      "language": "Python"
+    },
+    {
+      "full_name": "pallets/flask",
+      "stargazers_count": 74975,
+      "language": "Python"
+    },
+    {
+      "full_name": "expressjs/express",
+      "stargazers_count": 69583,
+      "language": "JavaScript"
+    },
+    {
+      "full_name": "makeplane/plane",
+      "stargazers_count": 62030,
+      "language": "TypeScript"
+    },
+    {
+      "full_name": "spring-projects/spring-framework",
+      "stargazers_count": 60310,
+      "language": "Java"
+    },
+    {
+      "full_name": "paperless-ngx/paperless-ngx",
+      "stargazers_count": 47744,
+      "language": "Python"
+    },
+    {
+      "full_name": "getsentry/sentry",
+      "stargazers_count": 45716,
+      "language": "Python"
+    },
+    {
+      "full_name": "payloadcms/payload",
+      "stargazers_count": 45680,
+      "language": "TypeScript"
+    }
+  ],
+  "database": [
+    {
+      "full_name": "Snailclimb/JavaGuide",
+      "stargazers_count": 159443,
+      "language": "JavaScript"
+    },
+    {
+      "full_name": "supabase/supabase",
+      "stargazers_count": 114578,
+      "language": "TypeScript"
+    },
+    {
+      "full_name": "thedotmack/claude-mem",
+      "stargazers_count": 113486,
+      "language": "TypeScript"
+    },
+    {
+      "full_name": "netdata/netdata",
+      "stargazers_count": 81287,
+      "language": "Go"
+    },
+    {
+      "full_name": "doocs/advanced-java",
+      "stargazers_count": 79169,
+      "language": "Java"
+    },
+    {
+      "full_name": "grafana/grafana",
+      "stargazers_count": 77719,
+      "language": "TypeScript"
+    },
+    {
+      "full_name": "redis/redis",
+      "stargazers_count": 77208,
+      "language": "C"
+    },
+    {
+      "full_name": "strapi/strapi",
+      "stargazers_count": 73435,
+      "language": "TypeScript"
+    },
+    {
+      "full_name": "coollabsio/coolify",
+      "stargazers_count": 65681,
+      "language": "PHP"
+    },
+    {
+      "full_name": "nocodb/nocodb",
+      "stargazers_count": 65436,
+      "language": "TypeScript"
+    },
+    {
+      "full_name": "usememos/memos",
+      "stargazers_count": 64302,
+      "language": "Go"
+    },
+    {
+      "full_name": "makeplane/plane",
+      "stargazers_count": 62030,
+      "language": "TypeScript"
+    }
+  ],
+  "deployment": [
+    {
+      "full_name": "kubernetes/kubernetes",
+      "stargazers_count": 128722,
+      "language": "Go"
+    },
+    {
+      "full_name": "microsoft/generative-ai-for-beginners",
+      "stargazers_count": 123025,
+      "language": "Jupyter Notebook"
+    },
+    {
+      "full_name": "Stirling-Tools/Stirling-PDF",
+      "stargazers_count": 95801,
+      "language": "TypeScript"
+    },
+    {
+      "full_name": "louislam/uptime-kuma",
+      "stargazers_count": 93288,
+      "language": "JavaScript"
+    },
+    {
+      "full_name": "netdata/netdata",
+      "stargazers_count": 81287,
+      "language": "Go"
+    },
+    {
+      "full_name": "moby/moby",
+      "stargazers_count": 72262,
+      "language": "Go"
+    },
+    {
+      "full_name": "dani-garcia/vaultwarden",
+      "stargazers_count": 70294,
+      "language": "Rust"
+    },
+    {
+      "full_name": "coollabsio/coolify",
+      "stargazers_count": 65681,
+      "language": "PHP"
+    },
+    {
+      "full_name": "traefik/traefik",
+      "stargazers_count": 65479,
+      "language": "Go"
+    },
+    {
+      "full_name": "usememos/memos",
+      "stargazers_count": 64302,
+      "language": "Go"
+    },
+    {
+      "full_name": "sansan0/TrendRadar",
+      "stargazers_count": 63464,
+      "language": "Python"
+    },
+    {
+      "full_name": "makeplane/plane",
+      "stargazers_count": 62030,
+      "language": "TypeScript"
+    }
+  ]
+}

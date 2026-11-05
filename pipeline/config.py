@@ -16,7 +16,7 @@ REPOS = [
     "expressjs/express",
     "fastapi/fastapi",
     "supabase/supabase",
-]
+]   
 
 def check_config():
     if not GITHUB_TOKEN:
