@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
     for name in REPOS:
         repo_id = flatten_repo(load_latest(f"{name}_repo"))["id"]
-        events = flatten_events(load_latest(f"{name}_events"))
+        events = flatten_events(load_latest(f"{name}_events"), repo_id)
         commits = flatten_commits(load_latest(f"{name}_commits"), repo_id)
         pulls = flatten_pulls(load_latest(f"{name}_pulls"), repo_id)
         issues = flatten_issues(load_latest(f"{name}_issues"), repo_id)

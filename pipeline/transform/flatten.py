@@ -25,7 +25,7 @@ def flatten_repo(repo):
     }
 
 
-def flatten_events(events):
+def flatten_events(events, repo_id):
     if not events:
         return pd.DataFrame()
 
@@ -33,7 +33,7 @@ def flatten_events(events):
 
     return pd.DataFrame({
         "id": df["id"],
-        "repo_id": df["repo.id"],
+        "repo_id": repo_id,
         "type": df["type"],
         "actor_login": df["actor.login"],
         "action": df.get("payload.action"),
@@ -101,7 +101,7 @@ if __name__ == "__main__":
             repo_row = flatten_repo(load_latest(f"{name}_repo"))
             repo_id = repo_row["id"]
 
-            events_df = flatten_events(load_latest(f"{name}_events"))
+            events_df = flatten_events(load_latest(f"{name}_events"), repo_id)
             commits_df = flatten_commits(load_latest(f"{name}_commits"), repo_id)
             pulls_df = flatten_pulls(load_latest(f"{name}_pulls"), repo_id)
             issues_df = flatten_issues(load_latest(f"{name}_issues"), repo_id)

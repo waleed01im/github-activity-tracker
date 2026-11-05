@@ -34,7 +34,7 @@ def run_repo(client, name, since):
     # 2. TRANSFORM
     repo_row = flatten_repo(repo_raw)
     repo_id = repo_row["id"]
-    events_df = flatten_events(events_raw)
+    events_df = flatten_events(events_raw, repo_id)
     commits_df = flatten_commits(commits_raw, repo_id)
     pulls_df = flatten_pulls(pulls_raw, repo_id)
     issues_df = flatten_issues(issues_raw, repo_id)
