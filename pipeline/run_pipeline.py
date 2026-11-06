@@ -17,13 +17,13 @@ from pipeline.validate.models import (
 from pipeline.validate.validator import validate_df
 
 
-def run_repo(client, name, since):
+def run_repo(client, name, since, max_pages):
     # 1. EXTRACT
     repo_raw = fetch_repo(name)
     events_raw = fetch_events(name)
-    commits_raw = fetch_commits(name, since)
-    pulls_raw = fetch_pulls(name, since)
-    issues_raw = fetch_issues(name, since)
+    commits_raw = fetch_commits(name, since, max_pages)
+    pulls_raw = fetch_pulls(name, since, max_pages)
+    issues_raw = fetch_issues(name, since, max_pages)
 
     save_raw_data(f"{name}_repo", repo_raw)
     save_raw_data(f"{name}_events", events_raw)
