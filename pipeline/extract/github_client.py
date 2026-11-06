@@ -54,28 +54,29 @@ def fetch_paginated(url, params=None, max_pages=10):
 
 
 def fetch_events(full_name):
-    return fetch_paginated(f"{GITHUB_API}/repos/{full_name}/events", max_pages=3)
+    return fetch_paginated(f"{GITHUB_API}/repos/{full_name}/events", max_pages=10)
 
 
-def fetch_commits(full_name, since):
+def fetch_commits(full_name, since, max_pages=10):
     return fetch_paginated(
-        f"{GITHUB_API}/repos/{full_name}/commits", {"since": since}
+        f"{GITHUB_API}/repos/{full_name}/commits", {"since": since}, max_pages,
     )
 
 
-def fetch_pulls(full_name, since):
+def fetch_pulls(full_name, since, max_pages=10):
     pulls = fetch_paginated(
         f"{GITHUB_API}/repos/{full_name}/pulls",
         {"state": "all", "sort": "updated", "direction": "desc"},
-        max_pages=3,
+        max_pages,
     )
     return [p for p in pulls if p["updated_at"] >= since]
 
 
-def fetch_issues(full_name, since):
+def fetch_issues(full_name, since, max_pages=10):
     return fetch_paginated(
         f"{GITHUB_API}/repos/{full_name}/issues",
         {"state": "all", "since": since},
+        max_pages,
     )
 
 
@@ -88,13 +89,20 @@ if __name__ == "__main__":
         "%Y-%m-%dT%H:%M:%SZ"
     )
 
+    if days <= 7:
+        max_pages = 10
+    elif days <= 30:
+        max_pages = 30
+    else:
+        max_pages = 50
+
     for name in REPOS:
         try:
             repo = fetch_repo(name)
             events = fetch_events(name)
-            commits = fetch_commits(name, since)
-            pulls = fetch_pulls(name, since)
-            issues = fetch_issues(name, since)
+            commits = fetch_commits(name, since, max_pages)
+            pulls = fetch_pulls(name, since, max_pages)
+            issues = fetch_issues(name, since, max_pages)
 
             save_raw_data(f"{name}_repo", repo)
             save_raw_data(f"{name}_events", events)
