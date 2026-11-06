@@ -9,8 +9,7 @@ load_dotenv()
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
-
-GITHUB_API = "https://api.github.com"
+GITHUB_API = os.getenv("GITHUB_API")
 
 REPOS_FILE = Path(__file__).parent.parent / "data" / "selected_repos.json"
 

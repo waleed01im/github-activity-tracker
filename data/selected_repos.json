@@ -1,34 +1,34 @@
 {
   "frontend": [
-    "freeCodeCamp/freeCodeCamp",
-    "morluto/rea",
     "react/react",
-    "nextlevelbuilder/ui-ux-pro-max-skill",
     "vercel/next.js",
-    "shadcn-ui/ui"
+    "react/react-native",
+    "mui/material-ui",
+    "tailwindlabs/tailwindcss",
+    "gatsbyjs/gatsby"
   ],
   "backend": [
-    "fastapi/fastapi",
-    "django/django",
     "spring-projects/spring-boot",
-    "headroomlabs-ai/headroom",
-    "apache/superset",
-    "pallets/flask"
+    "pallets/flask",
+    "expressjs/express",
+    "gofiber/fiber",
+    "motiondivision/motion",
+    "ansible/awx"
   ],
   "database": [
-    "Snailclimb/JavaGuide",
-    "supabase/supabase",
-    "thedotmack/claude-mem",
-    "netdata/netdata",
-    "doocs/advanced-java",
-    "grafana/grafana"
+    "redis/redis",
+    "strapi/strapi",
+    "nocodb/nocodb",
+    "payloadcms/payload",
+    "meteor/meteor",
+    "typeorm/typeorm"
   ],
   "deployment": [
     "kubernetes/kubernetes",
-    "microsoft/generative-ai-for-beginners",
-    "Stirling-Tools/Stirling-PDF",
-    "louislam/uptime-kuma",
-    "netdata/netdata",
-    "moby/moby"
+    "moby/moby",
+    "traefik/traefik",
+    "portainer/portainer",
+    "docker/compose",
+    "nginx/nginx"
   ]
 }
