@@ -67,12 +67,19 @@ def main():
         "%Y-%m-%dT%H:%M:%SZ"
     )
 
+    if days <= 7:
+        max_pages = 10
+    elif days <= 30:
+        max_pages = 30
+    else:
+        max_pages = 50
+
     client = get_client()
     failed = []
 
     for name in REPOS:
         try:
-            run_repo(client, name, since)
+            run_repo(client, name, since, max_pages)
         except Exception as e:
             print(f"FAILED {name}: {e}")
             failed.append(name)
