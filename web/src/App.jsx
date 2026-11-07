@@ -1,15 +1,36 @@
-export default function App() {
-  const toggle = () => {
-    const root = document.documentElement
-    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark'
-  }
+import {useState} from 'react'
+import Sidebar from './components/Sidebar'
+import Header from './components/Header'
+import KpiCard from './components/KpiCard'
+import data from '../data/sample.json'
 
+
+export default function App() {
+  const [theme, setTheme] = useState('light')
+  const [tab, setTab] = useState('Dashboard')
+  
+  function toggleTheme() {
+    const newtheme = theme === 'light' ? 'dark' : 'light'
+    setTheme(newtheme)
+    document.documentElement.dataset.theme = newtheme
+  }
   return (
-    <div style={{ padding: 32 }}>
-      <div className="card" style={{ padding: 24, maxWidth: 480 }}>
-        <h1 style={{ margin: 0, color: 'var(--heading)' }}>Repository Analytics</h1>
-        <p style={{ color: 'var(--subtext)' }}>Track your development activity at a glance</p>
-        <button onClick={toggle}>Toggle theme</button>
+    <div className="layout">
+      <Sidebar tab={tab} setTab={setTab}/>
+      <div className='main'>
+        <Header theme={theme} toggleTheme={toggleTheme}/>
+        <main className='content'>
+          {tab === 'Dashboard' ? (
+            <div className= "kpi-row">
+              {data.kpis.map((k) =>(
+                <KpiCard
+                  key={k.label} { ...k } />
+              ))}
+            </div>
+          ):(
+            <p>{tab} content</p>
+          )}
+        </main>
       </div>
     </div>
   )

@@ -1,0 +1,27 @@
+.kpi-card { padding: 20px; }
+
+.kpi-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.kpi-value {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--heading);
+}
+
+.kpi-label {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--subtext);
+}
+
+.sparkline { width: 90px; height: 36px; }
+
+.kpi-change { margin: 12px 0 0; font-size: 11px; font-weight: 600; }
+.kpi-change.up { color: #14b8a6; }
+.kpi-change.down { color: #f43f5e; }

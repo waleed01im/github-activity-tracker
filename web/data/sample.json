@@ -1,0 +1,32 @@
+{
+  "kpis": [
+    {
+      "label": "Total Commits",
+      "value": 12334,
+      "change": 12,
+      "trend": [1200, 1380, 1210, 1350, 1580, 1310, 1500, 1750],
+      "color": "#6366f1"
+    },
+    {
+      "label": "Total PRs",
+      "value": 16220,
+      "change": 8,
+      "trend": [1800, 1900, 2100, 1950, 2200, 2050, 2300, 2400],
+      "color": "#14b8a6"
+    },
+    {
+      "label": "Total Stars",
+      "value": 1600000,
+      "change": 5,
+      "trend": [100, 120, 115, 140, 150, 145, 170, 180],
+      "color": "#a78bfa"
+    },
+    {
+      "label": "Contributors",
+      "value": 2150,
+      "change": -3,
+      "trend": [310, 300, 320, 290, 305, 280, 295, 270],
+      "color": "#4338ca"
+    }
+  ]
+}

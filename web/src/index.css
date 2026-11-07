@@ -49,3 +49,13 @@ body {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .card:hover { transform: translateY(-2px); }
+
+.layout { display: flex; min-height: 100vh; }
+.main { flex: 1; min-width: 0; }
+.content { padding: 24px; }
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
