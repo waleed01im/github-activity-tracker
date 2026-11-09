@@ -12,7 +12,7 @@ import '../Styles/ChartCard.css'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip)
 
-export default function TrendCard({ title, labels, values, wide, showline = true, color = '#4f46e5' }) {
+export default function TrendCard({ title, labels, values, wide, showline = true, color = '#4f46e5', icon }) {
     const chartData = {
         labels: labels,
         datasets: [
@@ -51,11 +51,11 @@ export default function TrendCard({ title, labels, values, wide, showline = true
         scales: {
             x: {
                 grid: { display: false },
-                ticks: { color: '#94a3b8', font: { size: 12 } },
+                ticks: { color: '#94a3b8', font: { size: 12 },},
             },
             y: {
-                // beginAtZero: true,
-                grid: { color: 'rgba(148, 163, 184, 0.15)' },
+                border: { display: showline },
+                grid: { display: showline, color: 'rgba(148, 163, 184, 0.15)' },
                 ticks: { display: showline, color: '#94a3b8', font: { size: 12 } },
             },
         },
@@ -65,7 +65,7 @@ export default function TrendCard({ title, labels, values, wide, showline = true
         <div className={wide ? 'card chart-card wide' : 'card chart-card'}>
             <div className="chart-head">
                 <h3 className="chart-title">
-                    <span className="chart-icon" />
+                    {icon ? icon : <span className="chart-icon" />}
                     {title}
                 </h3>
             </div>

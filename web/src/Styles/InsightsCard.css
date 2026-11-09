@@ -26,6 +26,7 @@
     border-radius: 10px;
     transition: transform 0.2s ease; 
 }
+.insight-num i { font-size: 13px; line-height: 1; }
 .insight:hover { transform: translateY(-2px); }
 .insight strong { color: var(--heading); font-size: 13px; }
 .insight p { margin: 5px 0 0; width: 90px; color: var(--subtext); font-size: 12px; line-height: 1.5; }

@@ -20,8 +20,12 @@ export default function Header({ theme, toggleTheme }) {
                     <option>Last 8 Weeks</option>
                     <option>Last 4 Weeks</option>
                 </select>
-                <button onClick={toggleTheme}>
-                    {theme === 'light' ? 'Dark' : 'Light'}
+                <button onClick={toggleTheme} title="Toggle Theme">
+                    {theme === 'light' ? (
+                        <i className="fa-solid fa-moon" style={{ color: '#64748b' }}></i>
+                    ) : (
+                        <i className="fa-solid fa-sun" style={{ color: '#f59e0b' }}></i>
+                    )}
                 </button>
             </div>
 

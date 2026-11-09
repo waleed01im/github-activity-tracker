@@ -74,10 +74,27 @@
 .legend-pct { color: var(--heading); }
 
 
+/* Row-4 ki height chhoti karne ke liye */
+.row-4 .line-wrap { height: 200px; }
 
+/* Event Types */
+.donut-wrap.compact { margin-bottom: 12px; }
+.donut-wrap.compact .donut-center strong { font-size: 18px; }
+.donut-wrap.compact .donut-center span { font-size: 10px; }
+
+/* Legends 2-per-row (flex wrap) */
+.legend-compact {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 20px 10px;
+  flex: initial;
+  justify-content: initial;
+}
+.legend-compact li { font-size: 12px; gap: 4px; }
+.legend-compact .legend-pct { font-size: 12px; }
 
 .chart-card { 
-  padding: 10px;
+  padding: 20px;
   min-width: 0; 
   display: flex;
   flex-direction: column;

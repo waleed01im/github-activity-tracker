@@ -39,14 +39,14 @@ def run_repo(client, name, since, max_pages):
     pulls_df = flatten_pulls(pulls_raw, repo_id)
     issues_df = flatten_issues(issues_raw, repo_id)
 
-    # 3. VALIDATE (repo kharab ho to exception, baqi tables us par depend karte hain)
+    # 3. VALIDATE
     repo_ok = RepoModel(**repo_row).model_dump(mode="json")
     events, e_bad = validate_df(events_df, EventModel, name)
     commits, c_bad = validate_df(commits_df, CommitModel, name)
     pulls, p_bad = validate_df(pulls_df, PullRequestModel, name)
     issues, i_bad = validate_df(issues_df, IssueModel, name)
 
-    # 4. LOAD (pehle repos, phir baqi)
+    # 4. LOAD 
     upsert_rows(client, "repos", [repo_ok], "id", update=True)
     n_e = upsert_rows(client, "events", events, "id", update=False)
     n_c = upsert_rows(client, "commits", commits, "sha", update=False)

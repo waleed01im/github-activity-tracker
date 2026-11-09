@@ -1,7 +1,7 @@
 import '../Styles/ContributorsCard.css'
 
 export default function ContributorsCard({ items }) {
-  const top = items.slice(0, 5)
+  const top = items.slice(0, 4)
   const max = Math.max(...top.map((item) => item.commits), 1)
 
   return (

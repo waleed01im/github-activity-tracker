@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import useTheme from './hooks/usetheme'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
 import KpiCard from './components/KpiCard'
@@ -11,13 +12,11 @@ import data from './data/sample.json'
 
 
 export default function App() {
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useTheme()
   const [tab, setTab] = useState('Dashboard')
 
   function toggleTheme() {
-    const newtheme = theme === 'light' ? 'dark' : 'light'
-    setTheme(newtheme)
-    document.documentElement.dataset.theme = newtheme
+    setTheme(theme === 'light' ? 'dark' : 'light')
   }
   return (
     <div className="layout">
@@ -34,16 +33,53 @@ export default function App() {
 </div>
 
 <div className="row row-3">
-  <DonutCard title="Commits per Repository" centerLabel="Commits" items={data.commitsPerRepo} />
-  <DonutCard title="Activity by Category" centerLabel="Commits" items={data.categories} />
-  <TrendCard title="Weekly Commit Trend" labels={data.weeklyTrend.labels} values={data.weeklyTrend.values} />
+  <DonutCard
+    title="Commits per Repository"
+    centerLabel="Commits"
+    items={data.commitsPerRepo}
+    icon={<i className="fa-solid fa-code-branch" style={{ color: '#6366f1' }} />}
+  />
+  <DonutCard
+    title="Activity by Category"
+    centerLabel="Commits"
+    items={data.categories}
+    icon={<i className="fa-solid fa-layer-group" style={{ color: '#10b981' }} />}
+  />
+  <TrendCard
+    title="Weekly Commit Trend"
+    labels={data.weeklyTrend.labels}
+    values={data.weeklyTrend.values}
+    icon={<i className="fa-solid fa-chart-line" style={{ color: '#3b82f6' }} />}
+  />
 </div>
 
 <div className="row row-4">
-  <BarCard title="Weekday Pattern" labels={data.weekday.labels} values={data.weekday.values} color="#6366f1"/>
-  <TrendCard title="Hour Pattern (PKT)" labels={data.hours.labels} values={data.hours.values} showline={false} color="#14b8a6" />
+  <BarCard
+    title="Weekday Pattern"
+    labels={data.weekday.labels}
+    values={data.weekday.values}
+    color="#3b3ef5"
+    rotate={30}
+    icon={<i className="fa-solid fa-calendar-day" style={{ color: '#6366f1' }} />}
+  />
+  <TrendCard
+    title="Hour Pattern (PKT)"
+    labels={data.hours.labels}
+    values={data.hours.values}
+    showline={false}
+    color="#14b8a6"
+    icon={<i className="fa-solid fa-clock" style={{ color: '#3b82f6' }} />}
+  />
   <ContributorsCard items={data.contributors} />
-  <DonutCard title="Event Types" centerLabel="Events" items={data.events} height={150} width={150} />
+  <DonutCard
+    title="Event Types"
+    centerLabel="Events"
+    items={data.events}
+    height={130}
+    width={130}
+    compact
+    icon={<i className="fa-solid fa-bolt" style={{ color: '#a855f7' }} />}
+  />
 </div>
 
 <div className="row row-2">
@@ -54,10 +90,10 @@ export default function App() {
     labels={data.mergeTime.labels}
     values={data.mergeTime.values}
     color="#30dfca"
+    icon={<i className="fa-solid fa-stopwatch" style={{ color: '#6366f1' }} />}
   />
   <InsightsCard data={data} />
-</div>
-            </>
+</div>            </>
           ) : (
             <p>{tab} content</p>
           )}

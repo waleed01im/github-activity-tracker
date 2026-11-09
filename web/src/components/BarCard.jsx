@@ -4,7 +4,7 @@ import '../Styles/ChartCard.css'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip)
 
-export default function BarCard({ title, labels, color, values, big, bigLabel }) {
+export default function BarCard({ title, labels, color, values, rotate, big, bigLabel, icon }) {
     const chartData = {
         labels: labels,
         datasets: [
@@ -39,10 +39,11 @@ export default function BarCard({ title, labels, color, values, big, bigLabel })
         scales: {
             x: {
                 grid: { display: false },
-                ticks: { color: '#94a3b8', font: { size: 11 } },
+                ticks: { color: '#94a3b8', font: { size: 11 }, minRotation: rotate },
             },
             y: {
                 beginAtZero: true,
+                border: { display: false },
                 grid: { display: false, color: 'rgba(148, 163, 184, 0.15)' },
                 ticks: { display: false, color: '#94a3b8', font: { size: 11 } },
             },
@@ -53,7 +54,7 @@ export default function BarCard({ title, labels, color, values, big, bigLabel })
         <div className="card chart-card">
             <div className="chart-head">
                 <h3 className="chart-title">
-                    <span className="chart-icon" />
+                    {icon ? icon : <span className="chart-icon" />}
                     {title}
                 </h3>
                 {big && (

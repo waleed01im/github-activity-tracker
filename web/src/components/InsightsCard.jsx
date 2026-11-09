@@ -7,23 +7,26 @@ export default function InsightsCard({ data }) {
   const share = ((top.value / total) * 100).toFixed(0)
 
   const items = [
-    {
-      title: 'Commit activity',
-      text:
-        'Commit activity is ' +
-        (commits.change >= 0 ? 'up ' : 'down ') +
-        Math.abs(commits.change) +
-        '% compared to the previous period.',
-    },
-    {
-      title: 'Top category',
-      text: top.name + ' remains top activity category at ' + share + '% of total commits.',
-    },
-    {
-      title: 'Pull requests',
-      text: 'PRs are merged in a median of ' + data.mergeTime.median + ' which is faster than before.',
-    },
-  ]
+  {
+    title: 'Commit activity',
+    icon: 'fa-solid fa-chart-line',
+    text:
+      'Commit activity is ' +
+      (commits.change >= 0 ? 'up ' : 'down ') +
+      Math.abs(commits.change) +
+      '% compared to the previous period.',
+  },
+  {
+    title: 'Top category',
+    icon: 'fa-solid fa-layer-group',
+    text: top.name + ' remains top activity category at ' + share + '% of total commits.',
+  },
+  {
+    title: 'Pull requests',
+    icon: 'fa-solid fa-code-pull-request',
+    text: 'PRs are merged in a median of ' + data.mergeTime.median + ' which is faster than before.',
+  },
+]
 
   return (
     <div className="card insights">
@@ -31,9 +34,11 @@ export default function InsightsCard({ data }) {
         <i className="fa-solid fa-lightbulb text-amber-500 text-lg"></i> 
         Insights &amp; Key Takeaways</h3>
       <div className="insights-grid">
-        {items.map((item, i) => (
+        {items.map((item) => (
           <div key={item.title} className="insight">
-            <span className="insight-num">{i + 1}</span>
+            <span className="insight-num">
+              <i className={item.icon} />
+            </span>
             <div>
               <strong>{item.title}</strong>
               <p>{item.text}</p>
