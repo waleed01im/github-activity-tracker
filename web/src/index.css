@@ -1,12 +1,13 @@
 :root {
-  --font: 'Inter', system-ui, sans-serif;
+  /* --font: 'Inter', system-ui, sans-serif; */
+  --font: "Google Sans", sans-serif;
 
   --bg: #eef2f9;
   --text: #1e293b;
   --heading: #0f172a;
   --subtext: #64748b;
   --card: #ffffff;
-  --card-border: rgba(226, 232, 240, 0.8);
+  --card-border: rgba(195, 197, 201, 0.479);
   --card-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.05);
   --subtle: #f1f5f9;
   --sidebar: #13182b;
@@ -58,4 +59,11 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
 }

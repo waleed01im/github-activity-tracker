@@ -3,9 +3,14 @@ import '../Styles/Header.css';
 export default function Header({ theme, toggleTheme }) {
     return (
         <header className="header">
-            <div>
-                <h1>Github Activity Tracker</h1>
-                <p>Welcome to the Github Activity Tracker</p>
+            <div className="header-left">
+                <div className="header-icon">
+                    <i class="fa-solid fa-chart-simple text-xl"></i>
+                </div>
+                <div className="header-title">
+                    <h1>Github Activity Tracker</h1>
+                    <p>Welcome to the Github Activity Tracker</p>
+                </div>
             </div>
             <div className="header-right">
                 <select>

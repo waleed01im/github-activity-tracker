@@ -5,8 +5,32 @@
   padding: 16px 24px;
   border-bottom: 1px solid var(--card-border);
 }
+.header-left {
+  display: flex;
+  align-items: start;
+  gap: 16px;
+}
+.header-title {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 4px;
+}
+.header-title h1 {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 700;
+  color: var(--heading);
+}
+.header-icon i {
+  color: var(--brand-500);
+  font-size: 23px;
+  background: var(--card);
+  border-radius: 12px;
+  padding: 10px;
+}
 .header h2 { margin: 0; color: var(--heading); }
-.header p { margin:  0 5px; color: var(--subtext); font-size: 12px; }
+.header p { margin:  0 4px ; color: var(--subtext); font-size: 12px; }
 .header-right { display: flex; gap: 20px; }
 
 .header select,

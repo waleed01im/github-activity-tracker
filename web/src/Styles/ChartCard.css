@@ -1,0 +1,105 @@
+.chart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.chart-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--heading);
+}
+
+.chart-icon {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--brand-500);
+  border-top-color: transparent;
+  border-radius: 50%;
+}
+
+.chart-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand-600);
+  cursor: pointer;
+}
+.chart-link:hover { text-decoration: underline; }
+
+.donut-wrap {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 20px;
+}
+
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+
+.donut-center strong { font-size: 24px; font-weight: 800; color: var(--heading); }
+.donut-center span { font-size: 12px; color: var(--subtext); }
+
+.legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.legend li { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.legend-name { flex: 1; color: var(--subtext); }
+.legend-pct { color: var(--heading); }
+
+
+
+
+.chart-card { 
+  padding: 20px;
+  min-width: 0; 
+  display: flex;
+  flex-direction: column;
+
+}
+
+.line-wrap { position: relative; height: 290px; }
+
+.wide { grid-column: span 2; }
+@media (max-width: 900px) {
+  .wide { grid-column: span 1; }
+}
+
+
+
+.big-stat { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.big-stat strong { font-size: 32px; font-weight: 800; color: var(--heading); }
+.big-stat span {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--brand-700);
+  background: var(--brand-100);
+}
+[data-theme='dark'] .big-stat span {
+  color: #c7d2fe;
+  background: rgba(99, 102, 241, 0.2);
+}
