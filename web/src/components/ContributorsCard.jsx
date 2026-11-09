@@ -1,20 +1,23 @@
 import '../Styles/ContributorsCard.css'
 
 export default function ContributorsCard({ items }) {
-  const max = Math.max(...items.map((item) => item.commits))
+  const top = items.slice(0, 5)
+  const max = Math.max(...top.map((item) => item.commits), 1)
 
   return (
     <div className="card chart-card">
       <div className="chart-head">
         <h3 className="chart-title">
-          <span className="chart-icon" />
+          {/* <span className="chart-icon"> */}
+            <i className="fa-solid fa-trophy" />
+          {/* </span> */}
           Top Contributors
         </h3>
       </div>
 
       <ul className="contrib-list">
-        {items.map((item, i) => (
-          <li key={item.login} className="contrib-row">
+        {top.map((item, i) => (
+          <li key={item.login} className={`contrib-row rank-${i + 1}`}>
             <span className="contrib-rank">{i + 1}</span>
             <img
               className="contrib-avatar"
@@ -22,15 +25,19 @@ export default function ContributorsCard({ items }) {
               alt={item.login}
             />
             <div className="contrib-info">
-              <div className="contrib-top">
-                <span className="contrib-name">{item.login}</span>
-                <span className="contrib-count">{item.commits} commits</span>
-              </div>
-              <div className="contrib-track">
-                <div
-                  className="contrib-fill"
-                  style={{ width: (item.commits / max) * 100 + '%' }}
-                />
+              <span className="contrib-name">{item.login}</span>
+
+              <div className="contrib-line">
+                <div className="contrib-track">
+                  <div
+                    className="contrib-fill"
+                    style={{ width: (item.commits / max) * 100 + '%' }}
+                  />
+                </div>
+                <span className="contrib-count">
+                  <b>{item.commits.toLocaleString()}</b> 
+                  <small> commits</small>
+                </span>
               </div>
             </div>
           </li>

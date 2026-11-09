@@ -22,7 +22,7 @@ export default function DonutCard({ title, centerLabel, items }) {
   }
 
   const options = {
-    cutout: '78%',
+    cutout: '74%',
     responsive: false,
     maintainAspectRatio: false,
     plugins: {

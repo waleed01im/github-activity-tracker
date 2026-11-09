@@ -12,7 +12,7 @@ import '../Styles/ChartCard.css'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip)
 
-export default function TrendCard({ title, labels, values, wide, color = '#4f46e5' }) {
+export default function TrendCard({ title, labels, values, wide, showline = true, color = '#4f46e5' }) {
     const chartData = {
         labels: labels,
         datasets: [
@@ -56,7 +56,7 @@ export default function TrendCard({ title, labels, values, wide, color = '#4f46e
             y: {
                 // beginAtZero: true,
                 grid: { color: 'rgba(148, 163, 184, 0.15)' },
-                ticks: { color: '#94a3b8', font: { size: 12 } },
+                ticks: { display: showline, color: '#94a3b8', font: { size: 12 } },
             },
         },
     }

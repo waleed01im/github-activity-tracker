@@ -43,8 +43,8 @@ export default function BarCard({ title, labels, color, values, big, bigLabel })
             },
             y: {
                 beginAtZero: true,
-                grid: { color: 'rgba(148, 163, 184, 0.15)' },
-                ticks: { color: '#94a3b8', font: { size: 11 } },
+                grid: { display: false, color: 'rgba(148, 163, 184, 0.15)' },
+                ticks: { display: false, color: '#94a3b8', font: { size: 11 } },
             },
         },
     }
@@ -56,13 +56,15 @@ export default function BarCard({ title, labels, color, values, big, bigLabel })
                     <span className="chart-icon" />
                     {title}
                 </h3>
+                {big && (
+
+                    <div className="big-stat">
+                        <strong>{big}</strong>
+                        <span>{bigLabel}</span>
+                    </div>
+                )}
             </div>
-            {big && (
-                <div className="big-stat">
-                    <strong>{big}</strong>
-                    <span>{bigLabel}</span>
-                </div>
-            )}
+
             <div className="line-wrap">
                 <Bar data={chartData} options={options} />
             </div>
