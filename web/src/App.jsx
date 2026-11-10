@@ -8,7 +8,7 @@ import TrendCard from './components/TrendCard'
 import BarCard from './components/BarCard'
 import ContributorsCard from './components/ContributorsCard'
 import InsightsCard from './components/InsightsCard'
-import data from './data/sample.json'
+import data from '../../data/dashboard_stats.json'
 
 
 export default function App() {

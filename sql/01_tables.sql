@@ -58,6 +58,14 @@ create table if not exists issues (
   closed_at   timestamptz
 );
 
+-- dashboard_stats
+create table if not exists dashboard_stats (
+  id int primary key,
+  data jsonb not null,
+  updated_at timestamptz default now()
+);
+
+
 -- indexes
 create index if not exists idx_events_repo      on events (repo_id);
 create index if not exists idx_events_created   on events (created_at);

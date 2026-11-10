@@ -8,9 +8,7 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 
-data/raw/
-data/rejected/*.jsonl
-data/repos_backup.json
+data/
 logs/
 
 # React (web/)
