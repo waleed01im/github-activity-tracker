@@ -52,7 +52,6 @@ def build_stats(client):
     prs = load_table(client, "pull_requests")
     events = load_table(client, "events")
     
-    # Issues table load karein (agar mojood ho)
     try:
         issues = load_table(client, "issues")
     except Exception:
