@@ -10,6 +10,12 @@ import ContributorsCard from './components/ContributorsCard'
 import InsightsCard from './components/InsightsCard'
 import data from '../../data/dashboard_stats.json'
 
+import Repositories from './pages/Repositories.jsx'
+import Contributors from './pages/Contributors.jsx'
+import PullRequests from './pages/PullRequests.jsx'
+import Commits from './pages/Commits.jsx'
+import Events from './pages/Events.jsx'
+
 
 export default function App() {
   const [theme, setTheme] = useTheme()
@@ -24,79 +30,83 @@ export default function App() {
       <div className='main'>
         <Header theme={theme} toggleTheme={toggleTheme} />
         <main className='content'>
-          {tab === 'Dashboard' ? (
+          {tab === 'Dashboard' && (
             <>
               <div className="kpi-row">
-  {data.kpis.map((k) => (
-    <KpiCard key={k.label} {...k} />
-  ))}
-</div>
+                {data.kpis.map((k) => (
+                  <KpiCard key={k.label} {...k} />
+                ))}
+              </div>
 
-<div className="row row-3">
-  <DonutCard
-    title="Commits per Repository"
-    centerLabel="Commits"
-    items={data.commitsPerRepo}
-    icon={<i className="fa-solid fa-code-branch" style={{ color: '#6366f1' }} />}
-  />
-  <DonutCard
-    title="Activity by Category"
-    centerLabel="Commits"
-    items={data.categories}
-    icon={<i className="fa-solid fa-layer-group" style={{ color: '#10b981' }} />}
-  />
-  <TrendCard
-    title="Weekly Commit Trend"
-    labels={data.weeklyTrend.labels}
-    values={data.weeklyTrend.values}
-    icon={<i className="fa-solid fa-chart-line" style={{ color: '#3b82f6' }} />}
-  />
-</div>
+              <div className="row row-3">
+                <DonutCard
+                  title="Commits per Repository"
+                  centerLabel="Commits"
+                  items={data.commitsPerRepo}
+                  icon={<i className="fa-solid fa-code-branch" style={{ color: '#6366f1' }} />}
+                />
+                <DonutCard
+                  title="Activity by Category"
+                  centerLabel="Commits"
+                  items={data.categories}
+                  icon={<i className="fa-solid fa-layer-group" style={{ color: '#10b981' }} />}
+                />
+                <TrendCard
+                  title="Weekly Commit Trend"
+                  labels={data.weeklyTrend.labels}
+                  values={data.weeklyTrend.values}
+                  icon={<i className="fa-solid fa-chart-line" style={{ color: '#3b82f6' }} />}
+                />
+              </div>
 
-<div className="row row-4">
-  <BarCard
-    title="Weekday Pattern"
-    labels={data.weekday.labels}
-    values={data.weekday.values}
-    color="#3b3ef5"
-    rotate={30}
-    icon={<i className="fa-solid fa-calendar-day" style={{ color: '#6366f1' }} />}
-  />
-  <TrendCard
-    title="Hour Pattern (PKT)"
-    labels={data.hours.labels}
-    values={data.hours.values}
-    showline={false}
-    color="#14b8a6"
-    icon={<i className="fa-solid fa-clock" style={{ color: '#3b82f6' }} />}
-  />
-  <ContributorsCard items={data.contributors} />
-  <DonutCard
-    title="Event Types"
-    centerLabel="Events"
-    items={data.events}
-    height={130}
-    width={130}
-    compact
-    icon={<i className="fa-solid fa-bolt" style={{ color: '#a855f7' }} />}
-  />
-</div>
+              <div className="row row-4">
+                <BarCard
+                  title="Weekday Pattern"
+                  labels={data.weekday.labels}
+                  values={data.weekday.values}
+                  color="#3b3ef5"
+                  rotate={30}
+                  icon={<i className="fa-solid fa-calendar-day" style={{ color: '#6366f1' }} />}
+                />
+                <TrendCard
+                  title="Hour Pattern (PKT)"
+                  labels={data.hours.labels}
+                  values={data.hours.values}
+                  showline={false}
+                  color="#14b8a6"
+                  icon={<i className="fa-solid fa-clock" style={{ color: '#3b82f6' }} />}
+                />
+                <ContributorsCard items={data.contributors} />
+                <DonutCard
+                  title="Event Types"
+                  centerLabel="Events"
+                  items={data.events}
+                  height={130}
+                  width={130}
+                  compact
+                  icon={<i className="fa-solid fa-bolt" style={{ color: '#a855f7' }} />}
+                />
+              </div>
 
-<div className="row row-2">
-  <BarCard
-    title="PR Merge Time"
-    big={data.mergeTime.median}
-    bigLabel="Median Time"
-    labels={data.mergeTime.labels}
-    values={data.mergeTime.values}
-    color="#30dfca"
-    icon={<i className="fa-solid fa-stopwatch" style={{ color: '#6366f1' }} />}
-  />
-  <InsightsCard data={data} />
-</div>            </>
-          ) : (
-            <p>{tab} content</p>
+              <div className="row row-2">
+                <BarCard
+                  title="PR Merge Time"
+                  big={data.mergeTime.median}
+                  bigLabel="Median Time"
+                  labels={data.mergeTime.labels}
+                  values={data.mergeTime.values}
+                  color="#30dfca"
+                  icon={<i className="fa-solid fa-stopwatch" style={{ color: '#6366f1' }} />}
+                />
+                <InsightsCard data={data} />
+              </div>            
+            </>
           )}
+          {tab === 'Repositories' && <Repositories data={data} />}
+          {tab === 'Contributors' && <Contributors data={data} />}
+          {tab === 'Pull Requests' && <PullRequests data={data} />}
+          {tab === 'Commits' && <Commits data={data} />}
+          {tab === 'Events' && <Events data={data} />}
         </main>
       </div>
     </div>

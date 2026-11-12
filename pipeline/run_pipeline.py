@@ -58,35 +58,42 @@ def run_repo(client, name, since, max_pages):
         f" | rejected: {e_bad + c_bad + p_bad + i_bad}"
     )
 
-
-def main():
-    check_config()
-
-    days = int(sys.argv[1]) if len(sys.argv) > 1 else 1
-    since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime(
-        "%Y-%m-%dT%H:%M:%SZ"
-    )
-
+def _max_pages(days):
     if days <= 7:
         max_pages = 10
     elif days <= 30:
         max_pages = 30
     else:
         max_pages = 50
+    return max_pages
 
-    client = get_client()
+def run_etl(client, days):
+    since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
+    max_pages = _max_pages(days)
+
     failed = []
-
+    
     for name in REPOS:
         try:
             run_repo(client, name, since, max_pages)
         except Exception as e:
             print(f"FAILED {name}: {e}")
             failed.append(name)
+    return failed
+        
+
+def main():
+    check_config()
+
+    days = int(sys.argv[1]) if len(sys.argv) > 1 else 1
+    failed = run_etl(get_client(), days)
 
     if failed:
         print("Failed repos:", failed)
         sys.exit(1)
+    
 
 
 if __name__ == "__main__":

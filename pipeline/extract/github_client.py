@@ -17,7 +17,7 @@ def get_with_retry(url, params=None, retries=3):
     for attempt in range(1, retries + 1):
         try:
             response = requests.get(url, headers=HEADERS, params=params, timeout=30)
-        except (requests.ConnectionError, requests.Timeout) as e:
+        except requests.RequestException as e:
             error = e
         else:
             if response.status_code < 500 and response.status_code != 429:

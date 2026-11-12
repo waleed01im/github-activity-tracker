@@ -51,6 +51,12 @@ def build_stats(client):
     commits = load_table(client, "commits")
     prs = load_table(client, "pull_requests")
     events = load_table(client, "events")
+    
+    # Issues table load karein (agar mojood ho)
+    try:
+        issues = load_table(client, "issues")
+    except Exception:
+        issues = pd.DataFrame()
 
     # ---- Cleaning ----
     commits["committed_at"] = pd.to_datetime(commits["committed_at"], utc=True)
@@ -111,7 +117,7 @@ def build_stats(client):
         },
     ]
 
-    # ---- donuts ----
+    # ---- donuts (Dashboard Charts) ----
     counts = commits["label"].value_counts()
     commits_per_repo = [{"name": n, "value": int(v)} for n, v in counts.head(3).items()]
     others = int(counts.iloc[3:].sum())
@@ -120,8 +126,27 @@ def build_stats(client):
 
     categories = [{"name": c.title(), "value": int(v)} for c, v in commits["category"].value_counts().items()]
 
-    ev = events["type"].map(EVENT_NAMES).fillna("Others").value_counts().head(4)
-    event_items = [{"name": n, "value": int(v)} for n, v in ev.items()]
+    ev_all = events["type"].map(EVENT_NAMES).fillna("Others").value_counts()
+    event_items = [{"name": n, "value": int(v)} for n, v in ev_all.head(4).items()]
+    all_events = [{"name": n, "value": int(v)} for n, v in ev_all.items()]
+
+    # ---- Repositories Page ke liye POORA data (Real Stars & Forks) ----
+    repo_stars_map = repos.set_index("id")["stars"].fillna(0).to_dict()
+    repo_forks_map = repos.set_index("id")["forks"].fillna(0).to_dict() if "forks" in repos.columns else {}
+
+    commits["repo_stars"] = commits["repo_id"].map(repo_stars_map).fillna(0)
+    if repo_forks_map:
+        commits["repo_forks"] = commits["repo_id"].map(repo_forks_map).fillna(0)
+
+    all_repositories = []
+    for label, val in counts.items():
+        row = commits[commits["label"] == label].iloc[0]
+        all_repositories.append({
+            "name": label,
+            "value": int(val),
+            "stars": int(row["repo_stars"]),
+            "forks": int(row["repo_forks"]) if "repo_forks" in row else 0
+        })
 
     # ---- trend aur bars ----
     weekly_trend = {
@@ -135,9 +160,35 @@ def build_stats(client):
     weekday = {"labels": [d[:3] for d in WEEKDAYS], "values": by_day.tolist()}
     hours = {"labels": [str(h) for h in range(24)], "values": by_hour.tolist()}
 
-    # ---- contributors ----
-    top = humans["author_login"].dropna().value_counts().head(4)
-    contributors = [{"login": n, "commits": int(v)} for n, v in top.items()]
+    # ---- contributors (REAL DATA) ----
+    pr_author_col = "author_login" if "author_login" in prs.columns else "user_login"
+    pr_counts = prs[pr_author_col].value_counts().to_dict() if pr_author_col in prs.columns else {}
+
+    issue_counts = {}
+    if not issues.empty:
+        issue_author_col = "author_login" if "author_login" in issues.columns else "user_login"
+        if issue_author_col in issues.columns:
+            issue_counts = issues[issue_author_col].value_counts().to_dict()
+
+    top_all = humans["author_login"].dropna().value_counts()
+    
+    contributors = []
+    for n, v in top_all.head(4).items():
+        contributors.append({
+            "login": n,
+            "commits": int(v),
+            "prs": int(pr_counts.get(n, 0)),
+            "issues": int(issue_counts.get(n, 0))
+        })
+        
+    all_contributors = []
+    for n, v in top_all.head(50).items():
+        all_contributors.append({
+            "login": n,
+            "commits": int(v),
+            "prs": int(pr_counts.get(n, 0)),
+            "issues": int(issue_counts.get(n, 0))
+        })
 
     # ---- PR merge time ----
     merged = prs[prs["merged_at"].notna() & (prs["merged_at"] >= cutoff)]
@@ -146,16 +197,42 @@ def build_stats(client):
     merge_counts = bins.value_counts().reindex(MERGE_LABELS).fillna(0).astype(int)
     median = (str(round(float(merge_hours.median()), 1)) + "h") if len(merge_hours) else "-"
 
+    # ---- Recent PRs & Commits for Pages ----
+    recent_prs_df = prs_window.sort_values("created_at", ascending=False).head(20)
+    recent_prs = [
+        {
+            "title": str(row.get("title", "No Title")),
+            "author": str(row.get("author_login", row.get("user_login", "Unknown"))),
+            "status": str(row.get("state", "open")).capitalize(),
+            "time": row["created_at"].strftime("%Y-%m-%d %H:%M")
+        } for _, row in recent_prs_df.iterrows()
+    ]
+
+    recent_commits_df = commits.sort_values("committed_at", ascending=False).head(20)
+    recent_commits = [
+        {
+            "msg": str(row.get("message", "No commit message")),
+            "author": str(row.get("author_login", "Unknown")),
+            "repo": str(row.get("label", "Unknown")),
+            "time": row["committed_at"].strftime("%Y-%m-%d %H:%M")
+        } for _, row in recent_commits_df.iterrows()
+    ]
+
     return {
         "updatedAt": now.isoformat(),
         "kpis": kpis,
-        "commitsPerRepo": commits_per_repo,
+        "commitsPerRepo": commits_per_repo,        
+        "allRepositories": all_repositories,       
         "categories": categories,
         "weeklyTrend": weekly_trend,
         "weekday": weekday,
         "hours": hours,
-        "contributors": contributors,
-        "events": event_items,
+        "contributors": contributors,              
+        "allContributors": all_contributors,       
+        "events": event_items,                     
+        "allEvents": all_events,                   
+        "recentPRs": recent_prs,                   
+        "recentCommits": recent_commits,           
         "mergeTime": {"median": median, "labels": MERGE_LABELS, "values": merge_counts.tolist()},
     }
 

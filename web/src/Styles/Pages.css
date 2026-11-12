@@ -1,0 +1,215 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--heading);
+}
+
+/* Table Styles */
+.table-card {
+  padding: 0;
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.data-table th, .data-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--card-border);
+  font-size: 14px;
+}
+
+.data-table th {
+  background: var(--subtle);
+  color: var(--subtext);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.data-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+  background: var(--subtle);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.font-bold { font-weight: 700; color: var(--heading); }
+.text-gray-500 { color: var(--subtext); }
+.mr-2 { margin-right: 8px; }
+
+.badge {
+  padding: 4px 10px;
+  background: var(--brand-50);
+  color: var(--brand-600);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+[data-theme='dark'] .badge { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; }
+
+/* PR Status Badges */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.status-badge.merged { background: #dcfce7; color: #16a34a; }
+.status-badge.open { background: #fef9c3; color: #ca8a04; }
+.status-badge.closed { background: #fee2e2; color: #dc2626; }
+[data-theme='dark'] .status-badge.merged { background: rgba(22, 163, 74, 0.15); color: #4ade80; }
+[data-theme='dark'] .status-badge.open { background: rgba(202, 138, 4, 0.15); color: #fbbf24; }
+[data-theme='dark'] .status-badge.closed { background: rgba(220, 38, 38, 0.15); color: #f87171; }
+
+/* List Styles (Commits & Events) */
+.list-card {
+  padding: 0;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--card-border);
+  transition: background 0.2s ease;
+}
+
+.list-item:hover { background: var(--subtle); }
+.list-item:last-child { border-bottom: none; }
+
+.list-content { flex: 1; }
+.list-content h4 { margin: 0 0 4px; font-size: 14px; color: var(--heading); }
+.list-content p { margin: 0; font-size: 13px; color: var(--subtext); }
+
+.list-time { font-size: 12px; color: var(--subtext); white-space: nowrap; }
+
+.commit-icon {
+  width: 36px; height: 36px; display: grid; place-items: center;
+  background: var(--subtle); color: var(--subtext); border-radius: 50%;
+}
+
+.event-icon {
+  width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px;
+}
+
+/* Contributors Grid */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.contrib-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.avatar-lg {
+  width: 80px; height: 80px; border-radius: 50%;
+  border: 3px solid var(--brand-100); margin-bottom: 16px;
+}
+
+.contrib-card h3 { margin: 0 0 4px; font-size: 18px; color: var(--heading); }
+.contrib-card p { margin: 0 0 16px; color: var(--subtext); font-size: 13px; }
+
+.contrib-stats {
+  display: flex; gap: 16px; font-size: 13px; font-weight: 600; color: var(--subtext);
+}
+.contrib-stats i { margin-right: 4px; color: var(--brand-500); }
+
+
+/* ==========================================
+   Custom Tooltip Styles
+   ========================================== */
+.custom-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.custom-tooltip:hover {
+  color: var(--brand-500);
+}
+
+/* Tooltip ka Text Box */
+.custom-tooltip::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 130%; /* Icon ke upar dikhane ke liye */
+  left: 50%;
+  transform: translateX(-50%) scale(0.9);
+  background-color: #1e293b; /* Dark background (GitHub style) */
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.3, 0, 0.2, 1);
+  pointer-events: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 50;
+}
+
+/* Chota sa Triangle (Arrow) tooltip ke neeche */
+.custom-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: 115%;
+  left: 50%;
+  transform: translateX(-50%) scale(0.9);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #1e293b transparent transparent transparent;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.3, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 50;
+}
+
+.custom-tooltip:hover::before,
+.custom-tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) scale(1);
+}
+
+[data-theme='dark'] .custom-tooltip::before {
+  background-color: #334155;
+  border: 1px solid #475569;
+}
+[data-theme='dark'] .custom-tooltip::after {
+  border-color: #334155 transparent transparent transparent;
+}
