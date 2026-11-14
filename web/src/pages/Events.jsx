@@ -3,14 +3,20 @@ import '../Styles/Pages.css'
 export default function Events({ data }) {
   const events = data.allEvents || []
 
-  // Event type ke hisaab se icon aur color decide karne ka function
   const getEventStyle = (eventName) => {
     switch (eventName) {
-      case 'PushEvent': return { icon: 'fa-arrow-up', color: '#10b981' }
-      case 'PullRequestEvent': return { icon: 'fa-code-pull-request', color: '#6366f1' }
-      case 'IssuesEvent': return { icon: 'fa-circle-exclamation', color: '#f59e0b' }
-      case 'WatchEvent': return { icon: 'fa-star', color: '#eab308' }
-      default: return { icon: 'fa-bolt', color: '#a855f7' }
+      case 'Push': return { icon: 'fa-arrow-up', color: '#10b981' } // Green
+      case 'PRs': return { icon: 'fa-code-pull-request', color: '#6366f1' } // Indigo
+      case 'Issues': return { icon: 'fa-circle-exclamation', color: '#f59e0b' } // Amber
+      case 'Stars': return { icon: 'fa-star', color: '#eab308' } // Yellow
+      case 'Forks': return { icon: 'fa-code-fork', color: '#14b8a6' } // Teal
+      case 'Created': return { icon: 'fa-plus', color: '#8b5cf6' } // Purple
+      case 'Deleted': return { icon: 'fa-trash', color: '#ef4444' } // Red
+      case 'Releases': return { icon: 'fa-tag', color: '#f97316' } // Orange
+      case 'Issue Comments': return { icon: 'fa-comment', color: '#3b82f6' } // Blue
+      case 'PR Reviews': return { icon: 'fa-check-double', color: '#06b6d4' } // Cyan
+      case 'Members': return { icon: 'fa-user-plus', color: '#8b5cf6' } // Purple
+      default: return { icon: 'fa-bolt', color: '#a855f7' } // Default
     }
   }
 
@@ -27,7 +33,7 @@ export default function Events({ data }) {
               </div>
               <div className="list-content">
                 <h4>{e.name}</h4>
-                <p>Total {e.value} events recorded in this category.</p>
+                <p>Total {e.value.toLocaleString()} events recorded in this category.</p>
               </div>
               <div className="list-time">Recent</div>
             </div>

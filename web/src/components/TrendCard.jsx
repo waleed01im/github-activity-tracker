@@ -36,6 +36,9 @@ export default function TrendCard({ title, labels, values, wide, showline = true
         maintainAspectRatio: false,
         interaction: { intersect: false, mode: 'index' },
         plugins: {
+            legend: {
+          display: false,
+        },
             tooltip: {
                 backgroundColor: 'rgba(15, 23, 42, 0.9)',
                 padding: 8,
@@ -50,12 +53,12 @@ export default function TrendCard({ title, labels, values, wide, showline = true
         },
         scales: {
             x: {
-                grid: { display: false },
+                grid: { display: showline },
                 ticks: { color: '#94a3b8', font: { size: 12 },},
             },
             y: {
-                border: { display: showline },
-                grid: { display: showline, color: 'rgba(148, 163, 184, 0.15)' },
+                border: { display: false},
+                grid: { display: false, color: 'rgba(148, 163, 184, 0.15)' },
                 ticks: { display: showline, color: '#94a3b8', font: { size: 12 } },
             },
         },

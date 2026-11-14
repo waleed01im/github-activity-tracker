@@ -34,6 +34,9 @@ export default function DonutCard({
     responsive: false,
     maintainAspectRatio: false,
     plugins: {
+      legend: {
+        display: false,
+      },
       tooltip: {
         backgroundColor: 'rgba(15, 23, 42, 0.9)',
         padding: 8,
@@ -73,7 +76,7 @@ export default function DonutCard({
         {items.map((item, i) => (
           <li key={item.name}>
             <span className="legend-dot" style={{ background: COLORS[i] }} />
-            <span className="legend-name">{item.name}</span>
+            <span className="legend-name ">{item.name}</span>
             <strong className="legend-pct">
               {((item.value / total) * 100).toFixed(1)}%
             </strong>

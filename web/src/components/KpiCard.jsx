@@ -1,9 +1,8 @@
-import Sparkline from "./Sparkline.jsx"
 import '../Styles/KpiCard.css'
 
-
-export default function KpiCard({ label, value, change, trend, color }) {
-    const up = change > 0
+export default function KpiCard({ label, value, change, color, icon }) {
+    // Agar change null hai (jaise Stars mein), toh error na aaye
+    const up = change > 0 || change === null;
 
     return (
         <div className="card kpi-card">
@@ -12,13 +11,21 @@ export default function KpiCard({ label, value, change, trend, color }) {
                     <p className="kpi-value">{value.toLocaleString()}</p>
                     <p className="kpi-label">{label}</p>
                 </div>
-                <Sparkline values={trend} color={color} />
+                
+                <div className="kpi-icon" style={{ color: color, backgroundColor: color + '15' }}>
+                    {icon}
+                </div>
             </div>
-            <p className={up ? 'kpi-change up' : 'kpi-change down'}>
-                {up ? '↑ +' : '↓ '}
-                {change}% vs previous period
-            </p>
+            
+            {change !== null && (
+                <p className={up ? 'kpi-change up' : 'kpi-change down'}>
+                    {up ? (
+                  <><i className="fa-solid fa-arrow-trend-up"></i> +{change}%</>
+                ) : (
+                  <><i className="fa-solid fa-arrow-trend-down"></i> {change}%</>
+                )}
+                </p>
+            )}
         </div>
     )
 }
-

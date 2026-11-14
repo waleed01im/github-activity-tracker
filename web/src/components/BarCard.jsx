@@ -24,6 +24,9 @@ export default function BarCard({ title, labels, color, values, rotate, big, big
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
+            legend: {
+          display: false,
+        },
             tooltip: {
                 backgroundColor: 'rgba(15, 23, 42, 0.9)',
                 padding: 8,

@@ -51,26 +51,32 @@ body {
 }
 .card:hover { transform: translateY(-2px); }
 
+
+
 .layout { display: flex; min-height: 100vh; }
 .main { flex: 1; min-width: 0; }
 .content { padding: 24px; }
 
 .kpi-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(5,1fr);
+  gap: 8px;
 }
 
+
 .row { display: grid; gap: 16px; margin-top: 20px;}
-.row-3 { grid-template-columns: 1.05fr 1.05fr 0.9fr; align-items: stretch; }
-.row-2 { grid-template-columns: 1.2fr 1.8fr; align-items: stretch; }
+.row-full { grid-template-columns: 1fr; width: 100%; }
+.row01 { grid-template-columns: 2fr 1fr; }
+.row02 { grid-template-columns: 1fr 2fr; }
 
-.row-2 .card { padding: 16px; }
-.row-2 .chart-card { height: 250px; position: relative; } 
+.row03 { grid-template-columns: 0.95fr 0.95fr 1fr 1.1fr; gap: 12px; align-items: stretch; }
+.row03 .card { padding: 16px; }
+.row03 .line-wrap { max-height: 210px; }
+.row03 .chart-card { position: relative; }
 
-.row-4 { grid-template-columns: 0.95fr 0.95fr 1fr 1.1fr; gap: 12px; align-items: stretch; }
-.row-4 .card { padding: 16px; }
-.row-4 .chart-card { /* height: 320px;*/ position: relative; } /* fixed height */
+.row04 { grid-template-columns: 1.2fr 1.8fr; align-items: stretch; }  
+.row04 .chart-card{max-height: 250px; position: relative; }
+.row04 .card { padding: 16px; }
 
 @media (max-width: 1100px) {
   .row-3, .row-4, .row-2 { grid-template-columns: 1fr 1fr; }

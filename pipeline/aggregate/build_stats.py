@@ -1,4 +1,5 @@
 import json
+import math
 from pathlib import Path
 
 import pandas as pd
@@ -14,6 +15,18 @@ EVENT_NAMES = {
     "PushEvent": "Push",
     "PullRequestEvent": "PRs",
     "IssuesEvent": "Issues",
+    "ForkEvent": "Forks",
+    "CreateEvent": "Created",
+    "DeleteEvent": "Deleted",
+    "ReleaseEvent": "Releases",
+    "IssueCommentEvent": "Issue Comments",
+    "PullRequestReviewEvent": "PR Reviews",
+    "PullRequestReviewCommentEvent": "PR Review Comments",
+    "CommitCommentEvent": "Commit Comments",
+    "GollumEvent": "Wiki Edits",
+    "MemberEvent": "Members",
+    "PublicEvent": "Public",
+
 }
 MERGE_BINS = [0, 1, 6, 24, 72, 168, float("inf")]
 MERGE_LABELS = ["<1h", "1-6h", "6-24h", "1-3d", "3-7d", "7d+"]
@@ -59,9 +72,31 @@ def build_stats(client):
 
     # ---- Cleaning ----
     commits["committed_at"] = pd.to_datetime(commits["committed_at"], utc=True)
+    all_commits = commits.copy()
     commits = commits[commits["committed_at"] >= cutoff].copy()
     prs["created_at"] = pd.to_datetime(prs["created_at"], utc=True)
     prs["merged_at"] = pd.to_datetime(prs["merged_at"], utc=True)
+
+    def clean_event_name(e):
+        if pd.isna(e): return "Unknown"
+        if e in EVENT_NAMES: return EVENT_NAMES[e]
+        return str(e).replace("Event", "")
+
+    ev_all = events["type"].apply(clean_event_name).value_counts()
+    
+    top_3_events = ev_all.head(3)
+    event_items = [{"name": n, "value": int(v)} for n, v in top_3_events.items()]
+    others_sum = int(ev_all.iloc[3:].sum())
+    if others_sum > 0:
+        event_items.append({"name": "Others", "value": others_sum})
+
+    all_events = [{"name": n, "value": int(v)} for n, v in ev_all.items()]
+
+    if not issues.empty:
+        issues["created_at"] = pd.to_datetime(issues["created_at"], utc=True)
+        issues_window = issues[issues["created_at"] >= cutoff]
+    else:
+        issues_window = pd.DataFrame()
 
     names = repos.set_index("id")["full_name"]
     cat_json = json.loads(REPOS_FILE.read_text(encoding="utf-8"))
@@ -80,10 +115,33 @@ def build_stats(client):
     prs_weekly = trim_weeks(prs_window.groupby(pd.Grouper(key="created_at", freq="W-SUN")).size(), now)
     authors_weekly = trim_weeks(humans.groupby(pd.Grouper(key="committed_at", freq="W-SUN"))["author_login"].nunique(), now)
 
+    def weekly_counts(df, col):
+        if df.empty:
+            return commits_weekly * 0
+        series = df.groupby(pd.Grouper(key=col, freq="W-SUN")).size()
+        return series.reindex(commits_weekly.index, fill_value=0).fillna(0).astype(int)
+
+    prs_aligned = weekly_counts(prs_window, "created_at")
+    issues_aligned = weekly_counts(issues_window, "created_at")
+
     recent_authors = humans[humans["committed_at"] >= d28]["author_login"].nunique()
     before_authors = humans[(humans["committed_at"] >= d56) & (humans["committed_at"] < d28)]["author_login"].nunique()
 
     kpis = [
+        {
+            "label": "Total Stars",
+            "value": int(repos["stars"].fillna(0).sum()),
+            "change": None,
+            "trend": [],
+            "color": "#a78bfa",
+        },
+        {
+            "label": "Total Forks",
+            "value": int(repos["forks"].fillna(0).sum()) if "forks" in repos.columns else 0,
+            "change": None,
+            "trend": [],
+            "color": "#f59e0b",
+        },
         {
             "label": "Total Commits",
             "value": int(len(commits)),
@@ -101,35 +159,31 @@ def build_stats(client):
             "color": "#14b8a6",
         },
         {
-            "label": "Total Stars",
-            "value": int(repos["stars"].fillna(0).sum()),
-            "change": None,
-            "trend": [],
-            "color": "#a78bfa",
-        },
-        {
             "label": "Contributors",
             "value": int(humans["author_login"].nunique()),
             "change": pct(recent_authors, before_authors),
             "trend": authors_weekly.tolist(),
             "color": "#4338ca",
         },
+        
     ]
 
-    # ---- donuts (Dashboard Charts) ----
+    # ---- Categories ----
     counts = commits["label"].value_counts()
-    commits_per_repo = [{"name": n, "value": int(v)} for n, v in counts.head(3).items()]
-    others = int(counts.iloc[3:].sum())
-    if others:
-        commits_per_repo.append({"name": "Others", "value": others})
-
     categories = [{"name": c.title(), "value": int(v)} for c, v in commits["category"].value_counts().items()]
 
-    ev_all = events["type"].map(EVENT_NAMES).fillna("Others").value_counts()
-    event_items = [{"name": n, "value": int(v)} for n, v in ev_all.head(4).items()]
-    all_events = [{"name": n, "value": int(v)} for n, v in ev_all.items()]
+    # ---- PR Status Distribution ----
+    merged_count = int(prs_window["merged_at"].notna().sum())
+    open_count = int(len(prs_window[(prs_window["merged_at"].isna()) & (prs_window["state"] == "open")]))
+    closed_count = int(len(prs_window[(prs_window["merged_at"].isna()) & (prs_window["state"] == "closed")]))
+    
+    pr_status_distribution = [
+        {"name": "Merged", "value": merged_count},
+        {"name": "Open", "value": open_count},
+        {"name": "Closed", "value": closed_count}
+    ]
 
-    # ---- Repositories Page ke liye POORA data (Real Stars & Forks) ----
+    # ---- Repositories & Scatter Plot Data ----
     repo_stars_map = repos.set_index("id")["stars"].fillna(0).to_dict()
     repo_forks_map = repos.set_index("id")["forks"].fillna(0).to_dict() if "forks" in repos.columns else {}
 
@@ -138,28 +192,37 @@ def build_stats(client):
         commits["repo_forks"] = commits["repo_id"].map(repo_forks_map).fillna(0)
 
     all_repositories = []
+    repo_engagement = []
+
     for label, val in counts.items():
         row = commits[commits["label"] == label].iloc[0]
+        stars = int(row["repo_stars"])
+        forks = int(row["repo_forks"]) if "repo_forks" in row else 0
+        
         all_repositories.append({
             "name": label,
             "value": int(val),
-            "stars": int(row["repo_stars"]),
-            "forks": int(row["repo_forks"]) if "repo_forks" in row else 0
+            "stars": stars,
+            "forks": forks
+        })
+        
+        bubble_size = math.sqrt(val) * 2 if val > 0 else 5
+        repo_engagement.append({
+            "name": label,
+            "x": stars,
+            "y": forks,
+            "r": bubble_size,
+            "commits": int(val)
         })
 
-    # ---- trend aur bars ----
-    weekly_trend = {
-        "labels": ["W" + str(d.isocalendar().week) for d in commits_weekly.index],
-        "values": commits_weekly.tolist(),
-    }
-
+    # ---- Trend aur Bars (Weekday & Hours) ----
     local = commits["committed_at"].dt.tz_convert("Asia/Karachi")
     by_day = local.dt.day_name().value_counts().reindex(WEEKDAYS).fillna(0).astype(int)
     by_hour = local.dt.hour.value_counts().reindex(range(24)).fillna(0).astype(int)
     weekday = {"labels": [d[:3] for d in WEEKDAYS], "values": by_day.tolist()}
     hours = {"labels": [str(h) for h in range(24)], "values": by_hour.tolist()}
 
-    # ---- contributors (REAL DATA) ----
+    # ---- Contributors ----
     pr_author_col = "author_login" if "author_login" in prs.columns else "user_login"
     pr_counts = prs[pr_author_col].value_counts().to_dict() if pr_author_col in prs.columns else {}
 
@@ -216,14 +279,38 @@ def build_stats(client):
             "time": row["committed_at"].strftime("%Y-%m-%d %H:%M")
         } for _, row in recent_commits_df.iterrows()
     ]
+    # ---- Top Languages Calculation ----
+    if "language" in repos.columns:
+        lang_counts = repos["language"].value_counts().head(5)
+        top_languages = [{"name": lang, "value": int(count)} for lang, count in lang_counts.items() if pd.notna(lang)]
+    else:
+        top_languages = []
 
+
+    # ---- Heatmap Data (Last 365 Days) ----
+    heatmap_cutoff = now - pd.Timedelta(days=365)
+    heatmap_commits = all_commits[all_commits["committed_at"] >= heatmap_cutoff].copy()
+    heatmap_commits["date"] = (heatmap_commits["committed_at"].dt.tz_convert("Asia/Karachi").dt.strftime("%Y-%m-%d"))
+    heatmap_list = [{"date": k, "count": int(v)} for k, v in heatmap_commits["date"].value_counts().items()]
+    # ---- FINAL RETURN ----
     return {
         "updatedAt": now.isoformat(),
         "kpis": kpis,
-        "commitsPerRepo": commits_per_repo,        
         "allRepositories": all_repositories,       
         "categories": categories,
-        "weeklyTrend": weekly_trend,
+        "heatmap": heatmap_list,
+        "weeklyActivity": {
+            "labels": ["W" + str(d.isocalendar().week) for d in commits_weekly.index],
+            "datasets": [
+                {"label": "Commits", "data": [int(x) for x in commits_weekly.tolist()], "color": "#6366f1"},
+                {"label": "PRs", "data": [int(x) for x in prs_aligned.tolist()], "color": "#14b8a6"},
+                {"label": "Issues", "data": [int(x) for x in issues_aligned.tolist()], "color": "#f59e0b"},
+                {"label": "Active Contributors", "data": [int(x) for x in authors_weekly.tolist()], "color": "#a855f7"} 
+            ],
+        },
+        "topLanguages": top_languages,
+        "prStatus": pr_status_distribution,
+        "repoEngagement": repo_engagement,
         "weekday": weekday,
         "hours": hours,
         "contributors": contributors,              
