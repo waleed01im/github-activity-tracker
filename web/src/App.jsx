@@ -7,6 +7,7 @@ import loadVideo from './assets/loading.webm'
 // Components
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
+import Footer from './components/footer'
 import KpiCard from './components/KpiCard'
 import DonutCard from './components/DonutCard'
 import TrendCard from './components/TrendCard'
@@ -194,6 +195,7 @@ export default function App() {
           {tab === 'Commits' && <Commits data={data} />}
           {tab === 'Events' && <Events data={data} />}
         </main>
+        <Footer />
       </div>
     </div>
   )

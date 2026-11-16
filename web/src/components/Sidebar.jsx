@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import '../Styles/Sidebar.css';
 
 const TABS = [
@@ -10,22 +11,37 @@ const TABS = [
 ]
 
 export default function Sidebar({ tab, setTab }) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   return (
-    <aside className="sidebar">
-      <div className="sidebar-logo">
-        <i className="fa-brands fa-github text-3xl text-white"></i>
-        <p>TraceGit</p>
-      </div>
-      {TABS.map(({ name, icon }) => (
-        <button
-          key={name}
-          className={tab === name ? 'sidebar-item active' : 'sidebar-item'}
-          onClick={() => setTab(name)}
-        >
-          <i className={icon} />
-          {name}
+    <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+      
+      <div className="sidebar-header">
+        <div className="sidebar-logo">
+          <i className="fa-brands fa-github"></i>
+          <p>TraceGit</p>
+        </div>
+        
+        {/* Ye button mobile par CSS se hide ho jayega */}
+        <button className="menu-toggle" onClick={() => setIsCollapsed(!isCollapsed)}>
+          <i className="fa-solid fa-bars"></i>
         </button>
-      ))}
+      </div>
+
+      <div className="sidebar-nav">
+        {TABS.map(({ name, icon }) => (
+          <button
+            key={name}
+            className={tab === name ? 'sidebar-item active' : 'sidebar-item'}
+            onClick={() => setTab(name)}
+            title={isCollapsed ? name : ''}
+          >
+            <i className={icon} />
+            <span className="sidebar-text">{name}</span>
+          </button>
+        ))}
+      </div>
+      
     </aside>
   )
 }
