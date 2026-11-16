@@ -11,7 +11,8 @@ const TABS = [
 ]
 
 export default function Sidebar({ tab, setTab }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  // Yahan false ki jagah true kar dein
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
     <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
@@ -22,7 +23,6 @@ export default function Sidebar({ tab, setTab }) {
           <p>TraceGit</p>
         </div>
         
-        {/* Ye button mobile par CSS se hide ho jayega */}
         <button className="menu-toggle" onClick={() => setIsCollapsed(!isCollapsed)}>
           <i className="fa-solid fa-bars"></i>
         </button>
