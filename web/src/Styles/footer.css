@@ -60,8 +60,7 @@
 
     .footer-content p {
         font-size: 11px;
-        flex-direction: column;
-        gap: 6px;
+        gap: 3px;
     }
 
     .copyright-symbol {
