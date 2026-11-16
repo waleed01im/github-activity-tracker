@@ -2,9 +2,8 @@ import sys
 from datetime import datetime, timedelta, timezone
 
 from pipeline.config import REPOS, check_config
-from pipeline.extract.github_client import (
-    fetch_commits, fetch_events, fetch_issues, fetch_pulls, fetch_repo,
-)
+
+from pipeline.extract.github_client import fetch_events, fetch_graphql_data, fetch_all_commits
 from pipeline.extract.raw_store import save_raw_data
 from pipeline.load.loader import upsert_rows
 from pipeline.load.supabase_client import get_client
@@ -19,19 +18,18 @@ from pipeline.validate.validator import validate_df
 
 def run_repo(client, name, since, max_pages):
     # 1. EXTRACT
-    repo_raw = fetch_repo(name)
-    events_raw = fetch_events(name)
-    commits_raw = fetch_commits(name, since, max_pages)
-    pulls_raw = fetch_pulls(name, since, max_pages)
-    issues_raw = fetch_issues(name, since, max_pages)
+    repo_raw, commits_raw, pulls_raw, issues_raw = fetch_graphql_data(name, since)
+    commits_raw = fetch_all_commits(name, since, max_pages=max_pages)
+    events_raw = fetch_events(name,)
 
+    # Save raw data 
     save_raw_data(f"{name}_repo", repo_raw)
     save_raw_data(f"{name}_events", events_raw)
     save_raw_data(f"{name}_commits", commits_raw)
     save_raw_data(f"{name}_pulls", pulls_raw)
     save_raw_data(f"{name}_issues", issues_raw)
 
-    # 2. TRANSFORM
+    # 2. TRANSFORM 
     repo_row = flatten_repo(repo_raw)
     repo_id = repo_row["id"]
     events_df = flatten_events(events_raw, repo_id)
@@ -39,7 +37,7 @@ def run_repo(client, name, since, max_pages):
     pulls_df = flatten_pulls(pulls_raw, repo_id)
     issues_df = flatten_issues(issues_raw, repo_id)
 
-    # 3. VALIDATE
+    # 3. VALIDATE 
     repo_ok = RepoModel(**repo_row).model_dump(mode="json")
     events, e_bad = validate_df(events_df, EventModel, name)
     commits, c_bad = validate_df(commits_df, CommitModel, name)
@@ -57,10 +55,9 @@ def run_repo(client, name, since, max_pages):
         f"{name} | loaded: events {n_e}, commits {n_c}, PRs {n_p}, issues {n_i}"
         f" | rejected: {e_bad + c_bad + p_bad + i_bad}"
     )
-
 def _max_pages(days):
     if days <= 7:
-        max_pages = 10
+        max_pages = 12
     elif days <= 30:
         max_pages = 30
     else:

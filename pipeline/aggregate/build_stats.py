@@ -32,16 +32,31 @@ MERGE_BINS = [0, 1, 6, 24, 72, 168, float("inf")]
 MERGE_LABELS = ["<1h", "1-6h", "6-24h", "1-3d", "3-7d", "7d+"]
 
 
-def load_table(client, name, page=1000):
+def load_table(client, name, cutoff_date=None, repo_id=None, page=1000):
     rows, start = [], 0
     while True:
-        chunk = client.table(name).select("*").range(start, start + page - 1).execute().data
+        # Base query
+        query = client.table(name).select("*")
+        
+        #date filter (Commits, PRs, Issues ke liye)
+        if cutoff_date:
+            date_col = "committed_at" if name == "commits" else ("created_at" if name in ["pull_requests", "issues"] else None)
+            if date_col:
+                query = query.gte(date_col, cutoff_date.isoformat())
+                
+        # specific repo filter
+        if repo_id and name != "repos":
+            query = query.eq("repo_id", repo_id)
+
+        # Fetch chunk
+        chunk = query.range(start, start + page - 1).execute().data
         rows.extend(chunk)
+        
         if len(chunk) < page:
             break
         start += page
+        
     return pd.DataFrame(rows)
-
 
 def pct(recent, before):
     if before == 0:
@@ -54,21 +69,47 @@ def trim_weeks(weekly, now):
     return weekly.iloc[1:].tail(8)                   # pehla adhoora hafta 
 
 
-def build_stats(client):
+
+def build_stats(client, days=60, target_repo=None):
     now = pd.Timestamp.now(tz="UTC")
-    cutoff = now - pd.Timedelta(days=DAYS)
+    cutoff = now - pd.Timedelta(days=days)
+
     d28 = now - pd.Timedelta(days=28)
     d56 = now - pd.Timedelta(days=56)
 
     repos = load_table(client, "repos")
-    commits = load_table(client, "commits")
-    prs = load_table(client, "pull_requests")
-    events = load_table(client, "events")
     
+    repo_id = None
+    if target_repo and target_repo != "All":
+        match = repos[repos['full_name'].str.contains(target_repo, case=False, na=False)]
+        if not match.empty:
+            repo_id = match.iloc[0]['id']
+
+    commits = load_table(client, "commits", cutoff_date=cutoff, repo_id=repo_id)
+    prs = load_table(client, "pull_requests", cutoff_date=cutoff, repo_id=repo_id)
+    events = load_table(client, "events", cutoff_date=cutoff, repo_id=repo_id) 
+
     try:
-        issues = load_table(client, "issues")
+        issues = load_table(client, "issues", cutoff_date=cutoff, repo_id=repo_id)
     except Exception:
         issues = pd.DataFrame()
+        
+    # ... (Baqi ka aapka code waisa hi rahega)
+
+    # ---- Dynamic Repo Filtering  ----
+    if target_repo and target_repo != "All":
+        # Repo ID find karein
+        repo_match = repos[repos['full_name'].str.contains(target_repo, case=False, na=False)]
+        if not repo_match.empty:
+            rid = repo_match.iloc[0]['id']
+            # Sirf us repo ka data rakhein
+            commits = commits[commits['repo_id'] == rid]
+            prs = prs[prs['repo_id'] == rid]
+            events = events[events['repo_id'] == rid]
+            if not issues.empty:
+                issues = issues[issues['repo_id'] == rid]
+            repos = repos[repos['id'] == rid] 
+
 
     # ---- Cleaning ----
     commits["committed_at"] = pd.to_datetime(commits["committed_at"], utc=True)
@@ -331,11 +372,13 @@ def save_to_supabase(client, stats):
 
 if __name__ == "__main__":
     client = get_client()
-    stats = build_stats(client)
+    stats = build_stats(client, days=365)
 
     OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     OUT_FILE.write_text(json.dumps(stats, indent=2), encoding="utf-8")
     print("Saved", OUT_FILE)
 
     save_to_supabase(client, stats)
+    client.table("dashboard_stats").upsert(
+    {"id": 1, "data": stats, "updated_at": stats["updatedAt"]}).execute()
     print("Uploaded to Supabase")

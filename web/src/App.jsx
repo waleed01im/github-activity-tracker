@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import useTheme from './hooks/usetheme'
-import { supabase } from './supabase/supabase_Client'
 
 import loadVideo from './assets/loading.webm'
 
@@ -25,105 +25,144 @@ import PullRequests from './pages/PullRequests.jsx'
 import Commits from './pages/Commits.jsx'
 import Events from './pages/Events.jsx'
 
+
 export default function App() {
   const [theme, setTheme] = useTheme()
   const [tab, setTab] = useState('Dashboard')
 
-  // --- Supabase Data Fetching with Smart Cache ---
+  const [selectedRepo, setSelectedRepo] = useState('All')
+  const [selectedDays, setSelectedDays] = useState('all')
+  const [allRepos, setAllRepos] = useState([])
+
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
-
+  const [firstLoad, setFirstLoad] = useState(true)
 
   useEffect(() => {
+    let cancelled = false
+
     async function fetchData() {
-      try {
-        const { data: dbMeta, error } = await supabase
-          .from('dashboard_stats')
-          .select('updated_at')
-          .eq('id', 1)
-          .single()
+      const cacheKey = `dash_cache_${selectedRepo}_${selectedDays}`
+      const cachedData = localStorage.getItem(cacheKey)
+      const cachedTime = Number(localStorage.getItem(cacheKey + '_time'))
+      const TEN_MINUTES = 10 * 60 * 1000
+      const cacheValid = cachedData && Date.now() - cachedTime < TEN_MINUTES
 
-        if (error) throw error;
 
-        const serverUpdatedTime = dbMeta.updated_at;
-        const cachedTime = localStorage.getItem('dashboard_cache_time');
-        const cachedData = localStorage.getItem('dashboard_cache');
-
-        if (cachedData && cachedTime === serverUpdatedTime) {
-          setData(JSON.parse(cachedData));
-          setLoading(false);
-          return;
-        }
-
-        const { data: dbData, error: fullError } = await supabase
-          .from('dashboard_stats')
-          .select('data')
-          .eq('id', 1)
-          .single()
-
-        if (fullError) throw fullError;
-
-        if (dbData && dbData.data) {
-          setData(dbData.data);
-          localStorage.setItem('dashboard_cache', JSON.stringify(dbData.data));
-          localStorage.setItem('dashboard_cache_time', serverUpdatedTime);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      } finally {
-        setLoading(false)
+      if (cacheValid && !firstLoad) {
+        if (cancelled) return
+        const parsed = JSON.parse(cachedData)
+        setData(parsed)
+        if (selectedRepo === 'All' && parsed.allRepositories) setAllRepos(parsed.allRepositories)
+        return
       }
+
+      setLoading(true)
+      const startTime = Date.now()
+
+      let result = null
+      if (cacheValid) {
+        result = JSON.parse(cachedData)
+      } else {
+        try {
+          const response = await fetch(
+            `http://localhost:8000/api/dashboard?repo=${selectedRepo}&days=${selectedDays}`
+          )
+          if (!response.ok) throw new Error('API Error')
+          result = await response.json()
+          localStorage.setItem(cacheKey, JSON.stringify(result))
+          localStorage.setItem(cacheKey + '_time', Date.now().toString())
+        } catch (error) {
+          console.error(error)
+        }
+      }
+
+      const remaining = Math.max(0, 800 - (Date.now() - startTime))
+      await new Promise((r) => setTimeout(r, remaining))
+
+      if (cancelled) return
+      if (result) {
+        setData(result)
+        if (selectedRepo === 'All' && result.allRepositories) setAllRepos(result.allRepositories)
+      }
+      setLoading(false)
+      setFirstLoad(false)
     }
+
     fetchData()
-  }, [])
+    return () => {
+      cancelled = true
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRepo, selectedDays])
+
 
   function toggleTheme() {
     setTheme(theme === 'light' ? 'dark' : 'light')
   }
 
-  if (loading) return <div className="layout" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-    <video
-      src={loadVideo}
-      width={150}
-      height={150}
-      autoPlay
-      loop
-      muted
-      playsInline
-    />
-  </div>
-  if (!data) return <div className="layout" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><h2>Failed to load data.</h2></div>
+  if (loading && !data) {
+    return (
+      <div
+        className="layout"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          background: 'var(--bg)',
+        }}
+      >
+        <video src={loadVideo} width={150} height={150} autoPlay loop muted playsInline />
+      </div>
+    )
+  }
+
+  if (!data) {
+    return (
+      <div
+        className="layout"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <h2>Failed to load data.</h2>
+      </div>
+    )
+  }
 
   return (
     <div className="layout">
       <Sidebar tab={tab} setTab={setTab} />
-      <div className='main'>
+      <div className="main">
         <Header
           theme={theme}
           toggleTheme={toggleTheme}
-          repos={data.allRepositories || []}
+          repos={allRepos}
+          selectedRepo={selectedRepo}
+          setSelectedRepo={setSelectedRepo}
+          selectedDays={selectedDays}
+          setSelectedDays={setSelectedDays}
         />
 
-        <main className='content'>
+        <main className="content">
           {tab === 'Dashboard' && (
             <>
               {/* KPI ROW */}
               <div className="kpi-row">
                 {data.kpis.map((k) => {
-                  let kpiIcon = <i className="fa-solid fa-chart-simple" />;
-                  if (k.label === 'Total Commits') kpiIcon = <i className="fa-solid fa-code-commit" />;
-                  if (k.label === 'Total PRs') kpiIcon = <i className="fa-solid fa-code-pull-request" />;
-                  if (k.label === 'Total Stars') kpiIcon = <i className="fa-solid fa-star" />;
-                  if (k.label === 'Contributors') kpiIcon = <i className="fa-solid fa-users" />;
-                  if (k.label === 'Total Forks') kpiIcon = <i className="fa-solid fa-code-fork" />;
+                  let kpiIcon = <i className="fa-solid fa-chart-simple" />
+                  if (k.label === 'Total Commits') kpiIcon = <i className="fa-solid fa-code-commit" />
+                  if (k.label === 'Total PRs') kpiIcon = <i className="fa-solid fa-code-pull-request" />
+                  if (k.label === 'Total Stars') kpiIcon = <i className="fa-solid fa-star" />
+                  if (k.label === 'Contributors') kpiIcon = <i className="fa-solid fa-users" />
+                  if (k.label === 'Total Forks') kpiIcon = <i className="fa-solid fa-code-fork" />
 
-                  return (
-                    <KpiCard
-                      key={k.label}
-                      {...k}
-                      icon={kpiIcon}
-                    />
-                  )
+                  return <KpiCard key={k.label} {...k} icon={kpiIcon} />
                 })}
               </div>
 
@@ -136,7 +175,7 @@ export default function App() {
               </div>
 
               {/* ROW 1 */}
-              <div className='row row01'>
+              <div className="row row01">
                 <MultiLineCard
                   title="Weekly Activity"
                   labels={data.weeklyActivity?.labels || []}
@@ -168,27 +207,57 @@ export default function App() {
 
               {/* ROW 3 */}
               <div className="row row03">
-                <BarCard title="Weekday Pattern" labels={data.weekday?.labels || []} values={data.weekday?.values || []} color="#3b3ef5" rotate={30} icon={<i className="fa-solid fa-calendar-day" style={{ color: '#6366f1' }} />} />
-                <TrendCard title="Hour Pattern (PKT)" labels={data.hours?.labels || []} values={data.hours?.values || []} showline={false} color="#14b8a6" icon={<i className="fa-solid fa-clock" style={{ color: '#3b82f6' }} />} />
+                <BarCard
+                  title="Weekday Pattern"
+                  labels={data.weekday?.labels || []}
+                  values={data.weekday?.values || []}
+                  color="#3b3ef5"
+                  rotate={30}
+                  icon={<i className="fa-solid fa-calendar-day" style={{ color: '#6366f1' }} />}
+                />
+                <TrendCard
+                  title="Hour Pattern (PKT)"
+                  labels={data.hours?.labels || []}
+                  values={data.hours?.values || []}
+                  showline={false}
+                  color="#14b8a6"
+                  icon={<i className="fa-solid fa-clock" style={{ color: '#3b82f6' }} />}
+                />
                 <ContributorsCard items={data.contributors || []} />
-                <DonutCard title="Event Types" centerLabel="Events" items={data.events || []} height={130} width={130} compact icon={<i className="fa-solid fa-bolt" style={{ color: '#a855f7' }} />} />
+                <DonutCard
+                  title="Event Types"
+                  centerLabel="Events"
+                  items={data.events || []}
+                  height={130}
+                  width={130}
+                  compact
+                  icon={<i className="fa-solid fa-bolt" style={{ color: '#a855f7' }} />}
+                />
               </div>
 
               {/* ROW 4 */}
-              <div className='row row04'>
-                <BarCard title="PR Merge Time" big={data.mergeTime?.median || "0h"} bigLabel="Median Time" labels={data.mergeTime?.labels || []} values={data.mergeTime?.values || []} color="#30dfca" icon={<i className="fa-solid fa-stopwatch" style={{ color: '#6366f1' }} />} />
-                {/* <InsightsCard data={data} /> */}
+              <div className="row row04">
+                <BarCard
+                  title="PR Merge Time"
+                  big={data.mergeTime?.median || '0h'}
+                  bigLabel="Median Time"
+                  labels={data.mergeTime?.labels || []}
+                  values={data.mergeTime?.values || []}
+                  color="#30dfca"
+                  icon={<i className="fa-solid fa-stopwatch" style={{ color: '#6366f1' }} />}
+                />
                 <HorizontalBarCard
-                  title="Top Languages by Repositories" color="#3b3ef5"
-                  labels={data.topLanguages?.map(l => l.name) || []}
-                  values={data.topLanguages?.map(l => l.value) || []}
+                  title="Top Languages by Repositories"
+                  color="#3b3ef5"
+                  labels={data.topLanguages?.map((l) => l.name) || []}
+                  values={data.topLanguages?.map((l) => l.value) || []}
                   icon={<i className="fa-solid fa-code" style={{ color: '#6366f1' }} />}
                 />
               </div>
             </>
           )}
 
-          {/* Baqi Pages */}
+          {/* Pages */}
           {tab === 'Repositories' && <Repositories data={data} />}
           {tab === 'Contributors' && <Contributors data={data} />}
           {tab === 'Pull Requests' && <PullRequests data={data} />}
@@ -197,6 +266,14 @@ export default function App() {
         </main>
         <Footer />
       </div>
+
+      {/* Filter change par overlay loading */}
+      {loading && data && createPortal(
+        <div className="loading-overlay">
+          <video src={loadVideo} width={100} height={100} autoPlay loop muted playsInline />
+        </div>,
+        document.body
+      )}
     </div>
   )
 }

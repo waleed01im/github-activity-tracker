@@ -1,18 +1,26 @@
 name: Daily pipeline
 
 on:
-  # schedule:
-  #   - cron: "0 14 * * *"
+  schedule:
+    - cron: "*/10 * * * *"   # har 10 minute
   workflow_dispatch:
     inputs:
       days:
         description: "Number of days to fetch data for"
-        default: "2"
+        default: "1"
+
+concurrency:
+  group: pipeline
+  cancel-in-progress: false
 
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 9
+    env:
+      GITHUB_TOKEN: ${{ secrets.GH_API_TOKEN }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -23,8 +31,8 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - run: python -m pipeline.run_pipeline ${{ inputs.days || '2' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_API_TOKEN }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+      - name: Fetch and load data (ETL)
+        run: python -m pipeline.run_pipeline ${{ inputs.days || '1' }}
+
+      - name: Build dashboard stats
+        run: python -m pipeline.aggregate.build_stats
