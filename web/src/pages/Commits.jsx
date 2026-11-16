@@ -23,7 +23,7 @@ export default function Commits({ data }) {
       </div>
 
       {/* 2. Naye 4 KPI Cards (Pull Request walay style mein) */}
-      <div className="pr-kpi-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
+      <div className="pr-kpi-grid" style={{ marginBottom: '24px' }}>
         <div className="pr-kpi-card">
           <span className="pr-kpi-label">Total Commits</span>
           <h2 className="pr-kpi-value" style={{ color: 'var(--brand-600)' }}>

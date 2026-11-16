@@ -30,6 +30,11 @@
   --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
   --subtle: #1a233a;
 }
+body {
+  -webkit-font-smoothing: antialiased;
+  transform: translateZ(0); /* Browser ko force karta hai GPU use karne ke liye */
+}
+
 
 * { box-sizing: border-box; }
 
