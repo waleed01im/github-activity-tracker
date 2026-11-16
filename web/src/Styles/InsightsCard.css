@@ -85,6 +85,15 @@
   border-color: var(--brand-500);
 }
 
+
 @media (max-width: 900px) {
-  .insights-grid { grid-template-columns: 1fr; }
+  .insights-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+}
+
+@media (max-width: 600px) {
+  .insights { padding: 16px; }
+  .insights-header { flex-wrap: wrap; gap: 10px; }
+  .insights-grid { grid-template-columns: 1fr; gap: 12px; margin-top: 14px; }
+  .insight { padding: 10px; }
+  .insight p { width: auto; }
 }

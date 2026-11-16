@@ -93,3 +93,13 @@
   font-weight: 500;
   color: var(--subtext);
 }
+
+
+@media (max-width: 480px) {
+  .contrib-rank { width: 14px; font-size: 14px; }
+  .contrib-avatar { width: 26px; height: 26px; }
+  .contrib-name { font-size: 12px; }
+  .contrib-count { min-width: 42px; }
+  .contrib-count b { font-size: 12px; }
+  .contrib-count small { font-size: 10px; }
+}

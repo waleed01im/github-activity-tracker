@@ -57,3 +57,36 @@
 }
 .sidebar-item:hover { background: #1e293b; color: #fff; }
 .sidebar-item.active { background: var(--brand-600); color: #fff; }
+
+
+@media (max-width: 700px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: sticky;
+    top: 0;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 12px;
+    gap: 4px;
+    overflow-x: auto;
+    z-index: 100;
+  }
+  .sidebar::-webkit-scrollbar { display: none; }
+
+  .sidebar-logo {
+    margin-bottom: 0;
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+  .sidebar-logo p { display: none; }
+  .sidebar-logo i { font-size: 18px; padding: 6px; }
+
+  .sidebar-item {
+    padding: 8px 12px;
+    white-space: nowrap;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .sidebar-item i { font-size: 12px; width: 14px; }
+}

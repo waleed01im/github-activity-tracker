@@ -314,3 +314,49 @@
     transform: scale(1);
   }
 }
+
+
+
+
+
+
+
+/* Fix: class name mismatch — real class is .row04, not .row-4 */
+.row04 .line-wrap { height: 200px; }
+
+@media (max-width: 900px) {
+  .chart-card { padding: 16px; }
+  .donut-wrap { width: 160px; height: 160px; }
+  .line-wrap { height: 240px; }
+  .multiline-wrap { min-height: 200px; }
+}
+
+@media (max-width: 700px) {
+  .chart-head {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chart-title { font-size: 14px; }
+  .chart-link { font-size: 11px; }
+
+  .donut-wrap { width: 140px; height: 140px; margin-bottom: 14px; }
+  .donut-center strong { font-size: 20px; }
+  .donut-center span { font-size: 11px; }
+
+  /* Heatmap: allow horizontal scroll instead of clipping */
+  .heatmap-card { overflow-x: auto; overflow-y: hidden; }
+  .heatmap-wrapper { min-width: 640px; }
+  .line-wrap { height: 220px; }
+}
+
+@media (max-width: 480px) {
+  .legend-compact {
+    grid-template-columns: 1fr;
+    gap: 10px 8px;
+  }
+  .donut-wrap { width: 120px; height: 120px; }
+  .donut-center strong { font-size: 18px; }
+  .big-stat strong { font-size: 22px; }
+  .big-stat span { font-size: 10px; padding: 3px 8px; }
+  .heatmap-wrapper { min-width: 560px; }
+}
