@@ -9,7 +9,7 @@ export default function Header({ theme, toggleTheme}) {
                 </div>
                 <div className="header-title">
                     <h1>Github Activity Tracker</h1>
-                    <p>Welcome to the Github Activity Tracker</p>
+                    <p>Developer insights, simplified.</p>
                 </div>
             </div>
             <div className="header-right">
