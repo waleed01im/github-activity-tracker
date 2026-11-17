@@ -34,6 +34,36 @@ def get_with_retry(url, params=None, retries=3):
         time.sleep(wait)
 
 
+def post_graphql(query, variables, retries=3):
+    # GraphQL call, 5xx ya rate limit par retry
+    for attempt in range(1, retries + 1):
+        try:
+            r = requests.post(
+                GRAPHQL_URL,
+                json={"query": query, "variables": variables},
+                headers=HEADERS,
+                timeout=60,
+            )
+        except requests.RequestException as e:
+            error = str(e)
+        else:
+            if r.status_code == 200:
+                data = r.json()
+                if "errors" in data:
+                    raise Exception(f"GraphQL Errors: {data['errors']}")
+                return data
+            if r.status_code < 500 and r.status_code not in (403, 429):
+                raise Exception(f"GraphQL Error: {r.text}")
+            error = f"status {r.status_code}"
+
+        if attempt == retries:
+            raise RuntimeError(f"GraphQL failed after {retries} tries: {error}")
+
+        wait = 5 * attempt
+        print(f"GraphQL retry {attempt}/{retries} in {wait}s: {error}")
+        time.sleep(wait)
+
+
 def fetch_events(full_name):
     params = {"per_page": 100}
     items = []
@@ -49,8 +79,7 @@ def fetch_events(full_name):
     return items
 
 
-def fetch_graphql_data(full_name, since, max_pages=10):
-    # Repo info, PRs aur issues. Commits ab fetch_all_commits se aate hain.
+def fetch_graphql_data(full_name, since, max_pages=50):
     owner, name = full_name.split("/")
 
     query = """
@@ -86,7 +115,7 @@ def fetch_graphql_data(full_name, since, max_pages=10):
     variables = {
         "owner": owner, "name": name,
         "prCursor": None, "issueCursor": None,
-        "fetchPRs": True, "fetchIssues": True
+        "fetchPRs": True, "fetchIssues": True,
     }
 
     all_prs = []
@@ -97,66 +126,68 @@ def fetch_graphql_data(full_name, since, max_pages=10):
     pages_fetched = 0
 
     while pages_fetched < max_pages and (variables["fetchPRs"] or variables["fetchIssues"]):
-        response = requests.post(GRAPHQL_URL, json={'query': query, 'variables': variables}, headers=HEADERS)
-        if response.status_code != 200:
-            raise Exception(f"GraphQL Error: {response.text}")
+        data = post_graphql(query, variables)
 
-        data = response.json()
-        if 'errors' in data:
-            raise Exception(f"GraphQL Errors: {data['errors']}")
-
-        repo_data = data['data']['repository']
+        repo_data = data["data"]["repository"]
         if not repo_data:
             raise Exception("Repository not found or access denied.")
 
         if pages_fetched == 0:
             repo_raw = {
-                "id": repo_data.get('databaseId'),
-                "full_name": repo_data.get('nameWithOwner'),
-                "stargazers_count": repo_data.get('stargazerCount'),
-                "forks_count": repo_data.get('forkCount'),
-                "open_issues_count": repo_data.get('issuesCount', {}).get('totalCount'),
-                "created_at": repo_data.get('createdAt'),
-                "language": repo_data.get('primaryLanguage', {}).get('name') if repo_data.get('primaryLanguage') else None,
+                "id": repo_data.get("databaseId"),
+                "full_name": repo_data.get("nameWithOwner"),
+                "stargazers_count": repo_data.get("stargazerCount"),
+                "forks_count": repo_data.get("forkCount"),
+                "open_issues_count": repo_data.get("issuesCount", {}).get("totalCount"),
+                "created_at": repo_data.get("createdAt"),
+                "language": repo_data.get("primaryLanguage", {}).get("name") if repo_data.get("primaryLanguage") else None,
             }
 
         if variables["fetchPRs"]:
-            pr_data = repo_data.get('pullRequests', {})
-            for pr in pr_data.get('nodes', []):
-                author_login = pr['author']['login'] if pr.get('author') else "Unknown"
+            pr_data = repo_data.get("pullRequests", {})
+            nodes = pr_data.get("nodes", [])
+            for pr in nodes:
+                author_login = pr["author"]["login"] if pr.get("author") else "Unknown"
                 all_prs.append({
-                    "id": pr.get('databaseId'),
-                    "number": pr.get('number'),
-                    "title": pr.get('title'),
-                    "state": str(pr.get('state', '')).lower(),
+                    "id": pr.get("databaseId"),
+                    "number": pr.get("number"),
+                    "title": pr.get("title"),
+                    "state": str(pr.get("state", "")).lower(),
                     "user": {"login": author_login},
-                    "created_at": pr.get('createdAt'),
-                    "updated_at": pr.get('updatedAt'),
-                    "closed_at": pr.get('closedAt'),
-                    "merged_at": pr.get('mergedAt'),
+                    "created_at": pr.get("createdAt"),
+                    "updated_at": pr.get("updatedAt"),
+                    "closed_at": pr.get("closedAt"),
+                    "merged_at": pr.get("mergedAt"),
                 })
-            variables["prCursor"] = pr_data.get('pageInfo', {}).get('endCursor')
-            variables["fetchPRs"] = pr_data.get('pageInfo', {}).get('hasNextPage', False)
+            variables["prCursor"] = pr_data.get("pageInfo", {}).get("endCursor")
+            variables["fetchPRs"] = pr_data.get("pageInfo", {}).get("hasNextPage", False)
+            # since se purana PR aa gaya to aage ke sab bhi purane hain
+            if nodes and nodes[-1].get("updatedAt") and nodes[-1]["updatedAt"] < since:
+                variables["fetchPRs"] = False
 
         if variables["fetchIssues"]:
-            issue_data = repo_data.get('issues', {})
-            for issue in issue_data.get('nodes', []):
-                author_login = issue['author']['login'] if issue.get('author') else "Unknown"
+            issue_data = repo_data.get("issues", {})
+            nodes = issue_data.get("nodes", [])
+            for issue in nodes:
+                author_login = issue["author"]["login"] if issue.get("author") else "Unknown"
                 all_issues.append({
-                    "id": issue.get('databaseId'),
-                    "number": issue.get('number'),
-                    "title": issue.get('title'),
-                    "state": str(issue.get('state', '')).lower(),
+                    "id": issue.get("databaseId"),
+                    "number": issue.get("number"),
+                    "title": issue.get("title"),
+                    "state": str(issue.get("state", "")).lower(),
                     "user": {"login": author_login},
-                    "comments": issue.get('comments', {}).get('totalCount', 0),
-                    "created_at": issue.get('createdAt'),
-                    "updated_at": issue.get('updatedAt'),
-                    "closed_at": issue.get('closedAt'),
+                    "comments": issue.get("comments", {}).get("totalCount", 0),
+                    "created_at": issue.get("createdAt"),
+                    "updated_at": issue.get("updatedAt"),
+                    "closed_at": issue.get("closedAt"),
                 })
-            variables["issueCursor"] = issue_data.get('pageInfo', {}).get('endCursor')
-            variables["fetchIssues"] = issue_data.get('pageInfo', {}).get('hasNextPage', False)
+            variables["issueCursor"] = issue_data.get("pageInfo", {}).get("endCursor")
+            variables["fetchIssues"] = issue_data.get("pageInfo", {}).get("hasNextPage", False)
+            if nodes and nodes[-1].get("updatedAt") and nodes[-1]["updatedAt"] < since:
+                variables["fetchIssues"] = False
 
         pages_fetched += 1
+        time.sleep(0.3)
 
     return repo_raw, commits_raw, all_prs, all_issues
 
@@ -184,19 +215,14 @@ query($owner: String!, $name: String!, $since: GitTimestamp!, $cursor: String) {
 """
 
 
-def fetch_all_commits(full_name, since, max_pages=30):
+def fetch_all_commits(full_name, since, max_pages=50):
     owner, name = full_name.split("/")
     cursor = None
     out = []
 
     for _ in range(max_pages):
         variables = {"owner": owner, "name": name, "since": since, "cursor": cursor}
-        r = requests.post(GRAPHQL_URL, json={"query": COMMITS_QUERY, "variables": variables}, headers=HEADERS)
-        if r.status_code != 200:
-            raise Exception(f"GraphQL Error: {r.text}")
-        data = r.json()
-        if "errors" in data:
-            raise Exception(f"GraphQL Errors: {data['errors']}")
+        data = post_graphql(COMMITS_QUERY, variables)
 
         ref = data["data"]["repository"]["defaultBranchRef"]
         if not ref:
@@ -220,6 +246,7 @@ def fetch_all_commits(full_name, since, max_pages=30):
         if not history["pageInfo"]["hasNextPage"]:
             break
         cursor = history["pageInfo"]["endCursor"]
+        time.sleep(0.3)
 
     return out
 
@@ -235,13 +262,8 @@ if __name__ == "__main__":
         try:
             print(f"Fetching {name}...")
 
-            # 1. GraphQL Call (Repo, PRs, Issues)
             repo, _, pulls, issues = fetch_graphql_data(name, since)
-
-            # 2. Commits (paginated)
             commits = fetch_all_commits(name, since)
-
-            # 3. REST Call (Events)
             events = fetch_events(name)
 
             save_raw_data(f"{name}_repo", repo)

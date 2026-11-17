@@ -31,31 +31,27 @@ EVENT_NAMES = {
 MERGE_BINS = [0, 1, 6, 24, 72, 168, float("inf")]
 MERGE_LABELS = ["<1h", "1-6h", "6-24h", "1-3d", "3-7d", "7d+"]
 
-
 def load_table(client, name, cutoff_date=None, repo_id=None, page=1000):
     rows, start = [], 0
+    order_col = "sha" if name == "commits" else "id"   
     while True:
-        # Base query
         query = client.table(name).select("*")
-        
-        #date filter (Commits, PRs, Issues ke liye)
+
         if cutoff_date:
             date_col = "committed_at" if name == "commits" else ("created_at" if name in ["pull_requests", "issues"] else None)
             if date_col:
                 query = query.gte(date_col, cutoff_date.isoformat())
-                
-        # specific repo filter
+
         if repo_id and name != "repos":
             query = query.eq("repo_id", repo_id)
 
-        # Fetch chunk
-        chunk = query.range(start, start + page - 1).execute().data
+        chunk = query.order(order_col).range(start, start + page - 1).execute().data
         rows.extend(chunk)
-        
+
         if len(chunk) < page:
             break
         start += page
-        
+
     return pd.DataFrame(rows)
 
 def pct(recent, before):

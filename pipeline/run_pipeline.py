@@ -18,7 +18,7 @@ from pipeline.validate.validator import validate_df
 
 def run_repo(client, name, since, max_pages):
     # 1. EXTRACT
-    repo_raw, commits_raw, pulls_raw, issues_raw = fetch_graphql_data(name, since)
+    repo_raw, commits_raw, pulls_raw, issues_raw = fetch_graphql_data(name, since, max_pages=max_pages)
     commits_raw = fetch_all_commits(name, since, max_pages=max_pages)
     events_raw = fetch_events(name,)
 
