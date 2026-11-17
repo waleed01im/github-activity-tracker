@@ -25,6 +25,7 @@ import PullRequests from './pages/PullRequests.jsx'
 import Commits from './pages/Commits.jsx'
 import Events from './pages/Events.jsx'
 
+const API = import.meta.env.VITE_API_URL 
 
 export default function App() {
   const [theme, setTheme] = useTheme()
@@ -66,7 +67,7 @@ export default function App() {
       } else {
         try {
           const response = await fetch(
-            `http://localhost:8000/api/dashboard?repo=${selectedRepo}&days=${selectedDays}`
+            `${API}/api/dashboard?repo=${selectedRepo}&days=${selectedDays}`
           )
           if (!response.ok) throw new Error('API Error')
           result = await response.json()
