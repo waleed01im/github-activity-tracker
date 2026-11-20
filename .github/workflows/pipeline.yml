@@ -2,7 +2,7 @@ name: Daily pipeline
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # har 10 minute
+    - cron: "*/15 * * * *"   # har 15 minute
   workflow_dispatch:
     inputs:
       days:
@@ -16,8 +16,9 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 9
+    timeout-minutes: 14
     env:
+      GITHUB_API: ${{ secrets.GH_API }}
       GITHUB_TOKEN: ${{ secrets.GH_API_TOKEN }}
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
