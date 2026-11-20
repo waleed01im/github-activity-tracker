@@ -1,5 +1,6 @@
 import json
 import math
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -32,6 +33,7 @@ MERGE_BINS = [0, 1, 6, 24, 72, 168, float("inf")]
 MERGE_LABELS = ["<1h", "1-6h", "6-24h", "1-3d", "3-7d", "7d+"]
 
 def load_table(client, name, cutoff_date=None, repo_id=None, page=1000):
+    t0 = time.time()
     rows, start = [], 0
     order_col = "sha" if name == "commits" else "id"   
     while True:
@@ -52,6 +54,7 @@ def load_table(client, name, cutoff_date=None, repo_id=None, page=1000):
             break
         start += page
 
+    print(f"{name}: {len(rows)} rows in {time.time() - t0:.1f}s")
     return pd.DataFrame(rows)
 
 def pct(recent, before):
@@ -375,6 +378,4 @@ if __name__ == "__main__":
     print("Saved", OUT_FILE)
 
     save_to_supabase(client, stats)
-    client.table("dashboard_stats").upsert(
-    {"id": 1, "data": stats, "updated_at": stats["updatedAt"]}).execute()
     print("Uploaded to Supabase")

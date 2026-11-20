@@ -35,7 +35,6 @@ def get_with_retry(url, params=None, retries=3):
 
 
 def post_graphql(query, variables, retries=3):
-    # GraphQL call, 5xx ya rate limit par retry
     for attempt in range(1, retries + 1):
         try:
             r = requests.post(
@@ -147,6 +146,8 @@ def fetch_graphql_data(full_name, since, max_pages=50):
             pr_data = repo_data.get("pullRequests", {})
             nodes = pr_data.get("nodes", [])
             for pr in nodes:
+                if pr.get("updatedAt") and pr["updatedAt"] < since:
+                    continue
                 author_login = pr["author"]["login"] if pr.get("author") else "Unknown"
                 all_prs.append({
                     "id": pr.get("databaseId"),
@@ -161,7 +162,7 @@ def fetch_graphql_data(full_name, since, max_pages=50):
                 })
             variables["prCursor"] = pr_data.get("pageInfo", {}).get("endCursor")
             variables["fetchPRs"] = pr_data.get("pageInfo", {}).get("hasNextPage", False)
-            # since se purana PR aa gaya to aage ke sab bhi purane hain
+            # UPDATED_AT DESC order: aakhri node since se purana ho to aage sab purane hain
             if nodes and nodes[-1].get("updatedAt") and nodes[-1]["updatedAt"] < since:
                 variables["fetchPRs"] = False
 
@@ -169,6 +170,8 @@ def fetch_graphql_data(full_name, since, max_pages=50):
             issue_data = repo_data.get("issues", {})
             nodes = issue_data.get("nodes", [])
             for issue in nodes:
+                if issue.get("updatedAt") and issue["updatedAt"] < since:
+                    continue
                 author_login = issue["author"]["login"] if issue.get("author") else "Unknown"
                 all_issues.append({
                     "id": issue.get("databaseId"),
